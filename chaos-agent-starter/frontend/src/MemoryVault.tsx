@@ -9,7 +9,7 @@ import {
   X,
   Check,
   Tag,
-  Link,
+  Link as LinkIcon,
   Unlink,
   Calendar,
   AlertCircle,
@@ -19,7 +19,11 @@ import {
   Shield,
   ArrowRight,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Target,
+  Layers,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 export type MemoryCategory = 'Project Goal' | 'Key Principle' | 'Vision' | 'Reference';
@@ -71,8 +75,9 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
   // Delete Confirmation Modal State
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Link Task Popover State
+  // Link Task Modal State (Clean dedicated modal instead of cramped inline popover)
   const [linkingMemoryId, setLinkingMemoryId] = useState<string | null>(null);
+  const [taskSearchQuery, setTaskSearchQuery] = useState<string>('');
 
   const fetchMemoriesAndTasks = async () => {
     try {
@@ -217,7 +222,6 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
         body: JSON.stringify({ taskId })
       });
       if (res.ok) {
-        setLinkingMemoryId(null);
         setToastMessage('Task linked to goal!');
         fetchMemoriesAndTasks();
       }
@@ -242,235 +246,270 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
     }
   };
 
+  // Metrics summary
+  const totalGoals = memories.filter(m => m.category === 'Project Goal').length;
+  const totalPrinciples = memories.filter(m => m.category === 'Key Principle' || m.category === 'Vision').length;
+  const totalLinkedTasks = memories.reduce((acc, m) => acc + (m.linkedTaskIds?.length || 0), 0);
+
+  const activeTargetMemory = linkingMemoryId ? memories.find(m => m.id === linkingMemoryId) : null;
+  const availableTasksToLink = tasks.filter(t => 
+    activeTargetMemory && !(activeTargetMemory.linkedTaskIds || []).includes(t.id) &&
+    (taskSearchQuery.trim() === '' || t.title.toLowerCase().includes(taskSearchQuery.toLowerCase()))
+  );
+
   return (
-    <div className="memory-vault-container">
+    <div className="vault-page-container">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="memory-toast">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-cyan-400" />
-            <span>{toastMessage}</span>
-          </div>
-          <button onClick={() => setToastMessage(null)} className="toast-close-btn">
-            <X className="w-4 h-4" />
+        <div className="vault-toast-banner">
+          <Sparkles size={16} className="toast-sparkle" />
+          <span>{toastMessage}</span>
+          <button onClick={() => setToastMessage(null)} className="toast-dismiss-btn">
+            <X size={14} />
           </button>
         </div>
       )}
 
-      {/* Header */}
-      <div className="vault-header">
-        <div className="flex items-center gap-3">
-          <div className="icon-halo-cyan">
-            <Compass className="w-6 h-6 text-cyan-400" />
+      {/* Modern Header Section */}
+      <div className="vault-header-card">
+        <div className="vault-header-info">
+          <div className="vault-halo-badge">
+            <Compass size={24} />
           </div>
-          <div>
-            <h1 className="vault-title">Memory Vault</h1>
-            <p className="vault-subtitle">
+          <div className="vault-title-column">
+            <div className="vault-title-line">
+              <h1 className="vault-main-title">Memory Vault</h1>
+              <span className="vault-count-chip">{memories.length} Stored</span>
+            </div>
+            <p className="vault-description">
               Long-term project goals, guiding principles, and persistent knowledge linked with active tasks
             </p>
           </div>
         </div>
 
-        <div className="header-actions">
-          <button onClick={openCreateModal} className="action-btn-primary">
-            <Plus className="w-4 h-4" />
-            <span>New Memory / Goal</span>
+        <div className="vault-header-actions">
+          <button onClick={openCreateModal} className="btn-primary">
+            <Plus size={16} />
+            <span>New Goal / Memory</span>
           </button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="vault-filter-bar">
-        <div className="vault-search-box">
-          <Search className="w-4 h-4 text-gray-400" />
+      {/* High-Level Overview Metrics (Clean & Spacious) */}
+      <div className="vault-metrics-row">
+        <div className="vault-stat-box">
+          <div className="stat-top">
+            <span className="stat-label">Total Vault Items</span>
+            <Bookmark size={16} className="stat-icon-violet" />
+          </div>
+          <span className="stat-value">{memories.length}</span>
+          <span className="stat-subtext">Active knowledge base</span>
+        </div>
+
+        <div className="vault-stat-box">
+          <div className="stat-top">
+            <span className="stat-label">Project Goals</span>
+            <Target size={16} className="stat-icon-sky" />
+          </div>
+          <span className="stat-value">{totalGoals}</span>
+          <span className="stat-subtext">Strategic objectives</span>
+        </div>
+
+        <div className="vault-stat-box">
+          <div className="stat-top">
+            <span className="stat-label">Principles & Vision</span>
+            <Shield size={16} className="stat-icon-purple" />
+          </div>
+          <span className="stat-value">{totalPrinciples}</span>
+          <span className="stat-subtext">Operating axioms</span>
+        </div>
+
+        <div className="vault-stat-box">
+          <div className="stat-top">
+            <span className="stat-label">Linked Tasks</span>
+            <LinkIcon size={16} className="stat-icon-emerald" />
+          </div>
+          <span className="stat-value">{totalLinkedTasks}</span>
+          <span className="stat-subtext">Active task connections</span>
+        </div>
+      </div>
+
+      {/* Search and Category Filter Bar */}
+      <div className="vault-filter-container">
+        <div className="vault-search-wrapper">
+          <Search size={16} className="search-symbol" />
           <input
             type="text"
-            placeholder="Search memories, principles, or tags..."
+            placeholder="Search goals, principles, thesis, or #tags..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="vault-search-input"
+            className="vault-search-field"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="clear-search-btn">
-              <X className="w-3.5 h-3.5" />
+            <button onClick={() => setSearchQuery('')} className="search-reset-btn">
+              <X size={14} />
             </button>
           )}
         </div>
 
-        <div className="vault-category-tabs">
-          {['all', 'Project Goal', 'Key Principle', 'Vision', 'Reference'].map(cat => (
+        <div className="vault-tab-strip">
+          {[
+            { id: 'all', label: 'All Items', count: memories.length },
+            { id: 'Project Goal', label: 'Goals', count: totalGoals },
+            { id: 'Key Principle', label: 'Principles', count: memories.filter(m => m.category === 'Key Principle').length },
+            { id: 'Vision', label: 'Vision', count: memories.filter(m => m.category === 'Vision').length },
+            { id: 'Reference', label: 'References', count: memories.filter(m => m.category === 'Reference').length },
+          ].map(tab => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`vault-tab-btn ${selectedCategory === cat ? 'active' : ''}`}
+              key={tab.id}
+              onClick={() => setSelectedCategory(tab.id)}
+              className={`view-tab-btn ${selectedCategory === tab.id ? 'active' : ''}`}
             >
-              {cat === 'all' ? 'All Memories' : cat}
+              <span>{tab.label}</span>
+              <span className="tab-count">{tab.count}</span>
             </button>
           ))}
           <button
             onClick={() => setOnlyFavorites(!onlyFavorites)}
-            className={`vault-tab-btn ${onlyFavorites ? 'active-favorite' : ''}`}
+            className={`view-tab-btn ${onlyFavorites ? 'active' : ''}`}
           >
-            <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-amber-400 text-amber-400' : 'text-gray-400'}`} />
+            <Star size={13} className={onlyFavorites ? 'star-gold-fill' : ''} />
             <span>Favorites</span>
+            <span className="tab-count">{memories.filter(m => m.isFavorite).length}</span>
           </button>
         </div>
       </div>
 
       {/* Memory Cards Grid */}
       {loading ? (
-        <div className="loading-state-card">
+        <div className="vault-loading-card">
           <div className="loading-spinner" />
-          <span>Synchronizing Memory Vault...</span>
+          <span className="loading-text">Synchronizing Memory Vault...</span>
         </div>
       ) : memories.length === 0 ? (
-        <div className="empty-state-card">
-          <FolderHeart className="w-12 h-12 text-cyan-400 opacity-60 mb-2" />
-          <h3 className="text-lg font-semibold text-white">No Stored Memories Found</h3>
-          <p className="text-sm text-gray-400 max-w-md text-center mt-1">
-            Store your ambitious project visions, core operating principles, or hackathon goals. They will guide JARVIS when offering productivity suggestions.
+        <div className="vault-empty-card">
+          <FolderHeart size={44} className="empty-vault-icon" />
+          <h3 className="empty-vault-title">No Stored Memories Found</h3>
+          <p className="empty-vault-desc">
+            Store your project goals, core operating principles, or hackathon objectives. They anchor JARVIS when generating anti-procrastination guidance and task suggestions.
           </p>
-          <button onClick={openCreateModal} className="action-btn-primary mt-4">
-            <Plus className="w-4 h-4" />
+          <button onClick={openCreateModal} className="btn-primary" style={{ marginTop: 14 }}>
+            <Plus size={16} />
             <span>Create First Goal</span>
           </button>
         </div>
       ) : (
-        <div className="memories-grid">
+        <div className="vault-cards-grid">
           {memories.map(mem => {
             const linkedTasks = tasks.filter(t => (mem.linkedTaskIds || []).includes(t.id));
+            const categoryClass = mem.category.toLowerCase().replace(/\s+/g, '-');
             return (
-              <div key={mem.id} className="memory-card">
-                <div className="memory-card-header">
-                  <div className="flex items-center gap-2">
-                    <span className={`category-tag category-${mem.category.replace(/\s+/g, '-').toLowerCase()}`}>
+              <div key={mem.id} className="vault-item-card">
+                {/* Card Header */}
+                <div className="card-top-bar">
+                  <div className="badge-group">
+                    <span className={`vault-category-pill cat-${categoryClass}`}>
                       {mem.category}
                     </span>
-                    <span className={`importance-pill importance-${mem.importance}`}>
+                    <span className={`vault-importance-pill imp-${mem.importance}`}>
                       {mem.importance}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5">
+
+                  <div className="card-actions-group">
                     <button
                       onClick={() => handleToggleFavorite(mem.id)}
-                      className="card-icon-btn"
-                      title={mem.isFavorite ? 'Remove from favorites' : 'Star memory'}
+                      className={`btn-icon ${mem.isFavorite ? 'fav-active' : ''}`}
+                      title={mem.isFavorite ? 'Remove star' : 'Star favorite'}
                     >
-                      <Star
-                        className={`w-4 h-4 ${
-                          mem.isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-400 hover:text-amber-400'
-                        }`}
-                      />
+                      <Star size={14} className={mem.isFavorite ? 'star-gold-fill' : ''} />
                     </button>
                     <button
                       onClick={() => openEditModal(mem)}
-                      className="card-icon-btn"
+                      className="btn-icon"
                       title="Edit memory"
                     >
-                      <Edit2 className="w-4 h-4 text-gray-400 hover:text-cyan-400" />
+                      <Edit2 size={14} />
                     </button>
                     <button
                       onClick={() => setDeletingId(mem.id)}
-                      className="card-icon-btn"
+                      className="btn-icon btn-icon-danger"
                       title="Delete memory"
                     >
-                      <Trash2 className="w-4 h-4 text-gray-400 hover:text-rose-400" />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
 
-                <h3 className="memory-title">{mem.title}</h3>
-                <p className="memory-content">{mem.content}</p>
+                {/* Card Title & Content */}
+                <h3 className="card-item-title">{mem.title}</h3>
+                <p className="card-item-body">{mem.content}</p>
 
-                {/* Deadline if set */}
-                {mem.goalDeadline && (
-                  <div className="memory-meta-row">
-                    <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-xs text-gray-300">Target Deadline: {mem.goalDeadline}</span>
-                  </div>
-                )}
-
-                {/* Tags */}
-                {mem.tags && mem.tags.length > 0 && (
-                  <div className="memory-tags-row">
-                    {mem.tags.map(t => (
-                      <span key={t} className="memory-tag-item">
-                        #{t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Linked Tasks Section */}
-                <div className="linked-tasks-section">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-gray-300 flex items-center gap-1">
-                      <Link className="w-3 h-3 text-cyan-400" />
-                      Linked Tasks ({linkedTasks.length})
-                    </span>
-                    <button
-                      onClick={() => setLinkingMemoryId(linkingMemoryId === mem.id ? null : mem.id)}
-                      className="text-xs text-cyan-400 hover:underline flex items-center gap-1"
-                    >
-                      <Plus className="w-3 h-3" /> Link Task
-                    </button>
-                  </div>
-
-                  {/* Task Linker Popover */}
-                  {linkingMemoryId === mem.id && (
-                    <div className="link-task-popover">
-                      <div className="popover-header">
-                        <span className="text-xs font-medium text-white">Select Task to Link</span>
-                        <button onClick={() => setLinkingMemoryId(null)} className="popover-close">
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                      <div className="popover-list">
-                        {tasks
-                          .filter(t => !(mem.linkedTaskIds || []).includes(t.id))
-                          .slice(0, 5)
-                          .map(task => (
-                            <button
-                              key={task.id}
-                              onClick={() => handleLinkTask(mem.id, task.id)}
-                              className="popover-item"
-                            >
-                              <span className="truncate text-left text-xs text-gray-200">{task.title}</span>
-                              <Plus className="w-3 h-3 text-cyan-400 shrink-0" />
-                            </button>
-                          ))}
-                        {tasks.filter(t => !(mem.linkedTaskIds || []).includes(t.id)).length === 0 && (
-                          <span className="text-xs text-gray-400 p-2">No unlinked tasks available.</span>
-                        )}
-                      </div>
+                {/* Deadline & Tags Meta Row */}
+                <div className="card-metadata-row">
+                  {mem.goalDeadline && (
+                    <div className="card-deadline-pill">
+                      <Calendar size={13} className="text-muted" />
+                      <span>Target: {mem.goalDeadline}</span>
                     </div>
                   )}
 
-                  {/* Linked tasks list */}
-                  <div className="linked-task-pills">
-                    {linkedTasks.map(t => (
-                      <div key={t.id} className="linked-task-chip">
-                        <span className={`status-dot status-${t.status}`} />
-                        <span className="chip-title truncate">{t.title}</span>
-                        <button
-                          onClick={() => handleUnlinkTask(mem.id, t.id)}
-                          className="chip-remove-btn"
-                          title="Unlink task"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                    {linkedTasks.length === 0 && (
-                      <span className="text-xs text-gray-500 italic">No tasks currently linked.</span>
-                    )}
-                  </div>
+                  {mem.tags && mem.tags.length > 0 && (
+                    <div className="card-tags-wrap">
+                      {mem.tags.map(t => (
+                        <span key={t} className="card-tag-pill">
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="memory-card-footer">
-                  <span className="memory-date">
-                    Added: {new Date(mem.createdAt).toLocaleDateString()}
-                  </span>
+                {/* Linked Tasks Section (Clean, De-congested) */}
+                <div className="card-linked-tasks-tray">
+                  <div className="tasks-tray-header">
+                    <span className="tasks-tray-title">
+                      <LinkIcon size={13} />
+                      <span>Linked Tasks ({linkedTasks.length})</span>
+                    </span>
+                    <button
+                      onClick={() => {
+                        setLinkingMemoryId(mem.id);
+                        setTaskSearchQuery('');
+                      }}
+                      className="btn-secondary link-action-btn"
+                    >
+                      <Plus size={12} />
+                      <span>Link Task</span>
+                    </button>
+                  </div>
+
+                  {linkedTasks.length > 0 ? (
+                    <div className="tasks-chip-list">
+                      {linkedTasks.map(t => (
+                        <div key={t.id} className="linked-task-token">
+                          <span className={`task-status-indicator status-${t.status}`} />
+                          <span className="task-token-name" title={t.title}>{t.title}</span>
+                          <button
+                            onClick={() => handleUnlinkTask(mem.id, t.id)}
+                            className="task-token-remove"
+                            title="Unlink task"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="tasks-tray-empty">
+                      <span>No tasks connected yet. Click "+ Link Task" to anchor.</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="card-bottom-date">
+                  <span>Recorded on {new Date(mem.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             );
@@ -478,28 +517,91 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
         </div>
       )}
 
+      {/* Task Linker Dedicated Modal (Clean & Beautiful) */}
+      {linkingMemoryId && activeTargetMemory && (
+        <div className="modal-backdrop">
+          <div className="modal-dialog link-modal-box">
+            <div className="modal-header">
+              <div className="modal-header-left">
+                <LinkIcon size={18} className="text-primary" />
+                <h3 className="modal-title">Link Task to "{activeTargetMemory.title}"</h3>
+              </div>
+              <button onClick={() => setLinkingMemoryId(null)} className="btn-icon">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="link-modal-search">
+              <Search size={15} className="search-symbol" />
+              <input
+                type="text"
+                placeholder="Search available tasks..."
+                value={taskSearchQuery}
+                onChange={e => setTaskSearchQuery(e.target.value)}
+                className="vault-search-field"
+              />
+            </div>
+
+            <div className="link-tasks-scroll-list">
+              {availableTasksToLink.map(task => (
+                <div key={task.id} className="link-candidate-row">
+                  <div className="candidate-details">
+                    <span className={`task-status-indicator status-${task.status}`} />
+                    <span className="candidate-title">{task.title}</span>
+                    <span className="candidate-meta">
+                      {task.priority.toUpperCase()} {task.dueDate ? `• Due ${task.dueDate}` : ''}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleLinkTask(activeTargetMemory.id, task.id)}
+                    className="btn-secondary link-row-btn"
+                  >
+                    <Plus size={13} />
+                    <span>Link</span>
+                  </button>
+                </div>
+              ))}
+              {availableTasksToLink.length === 0 && (
+                <div className="candidate-empty-message">
+                  {tasks.length === 0
+                    ? 'No tasks created yet in Task Manager.'
+                    : 'All matching tasks are already linked to this goal.'}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-actions-row">
+              <button onClick={() => setLinkingMemoryId(null)} className="btn-secondary">
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create / Edit Memory Modal */}
       {isModalOpen && (
         <div className="modal-backdrop">
-          <div className="modal-dialog">
+          <div className="modal-dialog memory-form-modal">
             <div className="modal-header">
-              <div className="flex items-center gap-2">
-                <Compass className="w-5 h-5 text-cyan-400" />
+              <div className="modal-header-left">
+                <Compass size={20} className="text-primary" />
                 <h3 className="modal-title">
-                  {editingMemory ? 'Edit Memory' : 'New Project Goal or Memory'}
+                  {editingMemory ? 'Edit Stored Memory' : 'New Project Goal or Guiding Principle'}
                 </h3>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="modal-close-btn">
-                <X className="w-4 h-4" />
+              <button onClick={() => setIsModalOpen(false)} className="btn-icon">
+                <X size={16} />
               </button>
             </div>
-            <form onSubmit={handleSaveMemory} className="modal-form">
+
+            <form onSubmit={handleSaveMemory} className="memory-form-stack">
               <div className="form-group">
-                <label>Title</label>
+                <label className="form-label">Goal Title or Principle</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Deliver Top Hackathon Presentation"
+                  placeholder="e.g. Deliver Top Hackathon Presentation & Live Demo"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   className="form-input"
@@ -507,24 +609,24 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
               </div>
 
               <div className="form-group">
-                <label>Content / Core Thesis</label>
+                <label className="form-label">Core Content & Strategic Context</label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   required
-                  placeholder="Describe the long-term vision, key operating rule, or strategic importance..."
+                  placeholder="Detail the thesis, high-level requirements, and why this goal is of critical importance..."
                   value={content}
                   onChange={e => setContent(e.target.value)}
-                  className="form-input"
+                  className="form-textarea"
                 />
               </div>
 
               <div className="form-row-2">
                 <div className="form-group">
-                  <label>Category</label>
+                  <label className="form-label">Classification Category</label>
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value as MemoryCategory)}
-                    className="form-select"
+                    className="form-input"
                   >
                     <option value="Project Goal">Project Goal</option>
                     <option value="Key Principle">Key Principle</option>
@@ -532,24 +634,25 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
                     <option value="Reference">Reference</option>
                   </select>
                 </div>
+
                 <div className="form-group">
-                  <label>Importance</label>
+                  <label className="form-label">Importance Tier</label>
                   <select
                     value={importance}
                     onChange={e => setImportance(e.target.value as MemoryImportance)}
-                    className="form-select"
+                    className="form-input"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
                     <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
                   </select>
                 </div>
               </div>
 
               <div className="form-row-2">
                 <div className="form-group">
-                  <label>Target Deadline (Optional)</label>
+                  <label className="form-label">Target Milestone Date (Optional)</label>
                   <input
                     type="date"
                     value={goalDeadline}
@@ -557,8 +660,9 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
                     className="form-input"
                   />
                 </div>
+
                 <div className="form-group">
-                  <label>Tags (Comma separated)</label>
+                  <label className="form-label">Tags (Comma-separated)</label>
                   <input
                     type="text"
                     placeholder="hackathon, pitch, architecture"
@@ -569,14 +673,14 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
                 </div>
               </div>
 
-              {/* Multi-Select Tasks to link */}
+              {/* Task Linker inside creation modal */}
               <div className="form-group">
-                <label>Link to Existing Tasks (Optional)</label>
-                <div className="task-multiselect-box">
+                <label className="form-label">Link to Active Tasks in Vault</label>
+                <div className="task-multiselect-container">
                   {tasks.map(t => {
                     const isChecked = selectedTaskIds.includes(t.id);
                     return (
-                      <label key={t.id} className="task-checkbox-item">
+                      <label key={t.id} className="task-multiselect-row">
                         <input
                           type="checkbox"
                           checked={isChecked}
@@ -588,26 +692,27 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
                             }
                           }}
                         />
-                        <span className="truncate">{t.title}</span>
+                        <span className="multiselect-task-name">{t.title}</span>
                       </label>
                     );
                   })}
                   {tasks.length === 0 && (
-                    <span className="text-xs text-gray-500">No tasks created yet.</span>
+                    <span className="empty-subtext">No tasks available in Task Manager.</span>
                   )}
                 </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="modal-actions-row">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="action-btn-secondary"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="action-btn-primary">
-                  {editingMemory ? 'Update Memory' : 'Store in Vault'}
+                <button type="submit" className="btn-primary">
+                  <Check size={16} />
+                  <span>{editingMemory ? 'Save Changes' : 'Store in Memory Vault'}</span>
                 </button>
               </div>
             </form>
@@ -618,28 +723,24 @@ export const MemoryVault: React.FC<MemoryVaultProps> = ({
       {/* Delete Confirmation Modal */}
       {deletingId && (
         <div className="modal-backdrop">
-          <div className="modal-dialog">
-            <div className="modal-header">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-rose-400" />
-                <h3 className="modal-title">Confirm Memory Removal</h3>
-              </div>
-              <button onClick={() => setDeletingId(null)} className="modal-close-btn">
-                <X className="w-4 h-4" />
-              </button>
+          <div className="modal-dialog delete-confirm-box">
+            <div className="delete-icon-wrap">
+              <AlertCircle size={28} color="#ef4444" />
             </div>
-            <p className="text-sm text-gray-300 py-3">
-              Are you sure you want to permanently delete this memory from the Vault? This action cannot be undone.
+            <h3 className="modal-title">Delete Memory?</h3>
+            <p className="delete-confirm-text">
+              Are you sure you want to remove this entry from the Memory Vault? This action is permanent and cannot be undone.
             </p>
-            <div className="modal-footer">
-              <button onClick={() => setDeletingId(null)} className="action-btn-secondary">
+            <div className="modal-actions-row" style={{ marginTop: 20 }}>
+              <button onClick={() => setDeletingId(null)} className="btn-secondary">
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteMemory(deletingId)}
-                className="action-btn-danger"
+                className="btn-primary"
+                style={{ background: '#ef4444', borderColor: '#dc2626' }}
               >
-                Delete Memory
+                Delete Entry
               </button>
             </div>
           </div>

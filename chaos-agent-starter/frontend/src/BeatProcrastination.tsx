@@ -356,7 +356,7 @@ export const BeatProcrastination: React.FC<BeatProcrastinationProps> = ({
         <div className="header-actions">
           <button
             onClick={() => setShowPointsGuide(true)}
-            className="action-btn-secondary"
+            className="btn-secondary"
             title="View XP Calculation Rules"
           >
             <Info className="w-4 h-4 text-cyan-400" />
@@ -364,7 +364,7 @@ export const BeatProcrastination: React.FC<BeatProcrastinationProps> = ({
           </button>
           <button
             onClick={() => setIsChallengeModalOpen(true)}
-            className="action-btn-primary"
+            className="btn-primary"
           >
             <Plus className="w-4 h-4" />
             <span>New Challenge</span>
@@ -996,10 +996,10 @@ export const BeatProcrastination: React.FC<BeatProcrastinationProps> = ({
                 />
               </div>
               <div className="modal-footer">
-                <button type="button" onClick={() => setIsChallengeModalOpen(false)} className="action-btn-secondary">
+                <button type="button" onClick={() => setIsChallengeModalOpen(false)} className="btn-secondary">
                   Cancel
                 </button>
-                <button type="submit" className="action-btn-primary">
+                <button type="submit" className="btn-primary">
                   Launch Challenge
                 </button>
               </div>
@@ -1046,7 +1046,7 @@ export const BeatProcrastination: React.FC<BeatProcrastinationProps> = ({
               </div>
             </div>
             <div className="modal-footer">
-              <button onClick={() => setShowPointsGuide(false)} className="action-btn-primary">
+              <button onClick={() => setShowPointsGuide(false)} className="btn-primary">
                 Got it
               </button>
             </div>

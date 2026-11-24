@@ -1,0 +1,216 @@
+{
+  "threads": [
+    {
+      "id": "thread_sent_1795533258682",
+      "subject": "JARVIS Demo",
+      "snippet": "Ready for judging....",
+      "messages": [
+        {
+          "id": "gmail_msg_1795533258682_xjaz35",
+          "threadId": "thread_sent_1795533258682",
+          "sender": "JARVIS Authorized Operator",
+          "senderEmail": "user@jarvis-os.ai",
+          "recipient": "judge@hackathon.org",
+          "recipientEmail": "judge@hackathon.org",
+          "subject": "JARVIS Demo",
+          "body": "Ready for judging.",
+          "snippet": "Ready for judging....",
+          "date": "2026-11-24T15:14:18.682Z",
+          "isUnread": false,
+          "isImportant": false,
+          "hasAttachments": false,
+          "labels": [
+            "SENT"
+          ]
+        }
+      ],
+      "lastMessageDate": "2026-11-24T15:14:18.682Z",
+      "participantEmails": [
+        "user@jarvis-os.ai",
+        "judge@hackathon.org"
+      ],
+      "isImportant": false,
+      "isUnread": false,
+      "labels": [
+        "SENT"
+      ]
+    },
+    {
+      "id": "thread_hackathon_01",
+      "subject": "Final Pitch Deck Submission & Demo Day Logistics",
+      "snippet": "Judges will begin scoring at 09:00 AM UTC. Please verify your autonomous demo endpoint...",
+      "lastMessageDate": "2026-11-24T04:45:00.000Z",
+      "participantEmails": [
+        "judging-committee@ai-hackathon.org",
+        "user@jarvis-os.ai"
+      ],
+      "isImportant": true,
+      "isUnread": true,
+      "labels": [
+        "INBOX",
+        "IMPORTANT",
+        "HACKATHON"
+      ],
+      "messages": [
+        {
+          "id": "msg_01_a",
+          "threadId": "thread_hackathon_01",
+          "sender": "Autonomous Agents Track Committee",
+          "senderEmail": "judging-committee@ai-hackathon.org",
+          "recipient": "JARVIS Operations Lead",
+          "recipientEmail": "user@jarvis-os.ai",
+          "subject": "Final Pitch Deck Submission & Demo Day Logistics",
+          "body": "Hello JARVIS Team,\n\nWe are excited to confirm that your project \"JARVIS — The Time Traveller\" has been shortlisted for the final evaluation round in the Autonomous Agents track.\n\nKey Requirements:\n1. Please ensure your demo endpoint is publicly accessible and running live.\n2. Submit your final architecture diagram and slide deck by 11:59 PM tonight.\n3. You will have a 5-minute uninterrupted live demonstration slot followed by 3 minutes of technical Q&A with judges.\n\nPlease reply with your confirmation and public live URL.\n\nBest regards,\nTrack Committee",
+          "snippet": "We are excited to confirm that your project \"JARVIS — The Time Traveller\" has been shortlisted...",
+          "date": "2026-11-24T04:45:00.000Z",
+          "isUnread": true,
+          "isImportant": true,
+          "hasAttachments": true,
+          "attachments": [
+            {
+              "id": "att_01",
+              "filename": "Judge_Rubric_Autonomous_Agents_2026.pdf",
+              "mimeType": "application/pdf",
+              "sizeBytes": 245760
+            }
+          ],
+          "labels": [
+            "INBOX",
+            "IMPORTANT",
+            "HACKATHON"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thread_security_02",
+      "subject": "Urgent: Review NIST Agentic Safety and Model Citation Audit",
+      "snippet": "Regarding compliance for autonomous model dispatch and tool execution gates...",
+      "lastMessageDate": "2026-11-23T09:00:00.000Z",
+      "participantEmails": [
+        "compliance-sec@cloud-governance.io",
+        "user@jarvis-os.ai"
+      ],
+      "isImportant": true,
+      "isUnread": false,
+      "labels": [
+        "INBOX",
+        "IMPORTANT",
+        "SECURITY"
+      ],
+      "messages": [
+        {
+          "id": "msg_02_a",
+          "threadId": "thread_security_02",
+          "sender": "Dr. Elena Rostova",
+          "senderEmail": "compliance-sec@cloud-governance.io",
+          "recipient": "JARVIS Architecture",
+          "recipientEmail": "user@jarvis-os.ai",
+          "subject": "Urgent: Review NIST Agentic Safety and Model Citation Audit",
+          "body": "Hi Team,\n\nI reviewed your latest multi-step orchestration pipeline. I am particularly impressed by the explicit human-in-the-loop security gates implemented before external side effects like email dispatch and database writes.\n\nCould you confirm whether all external communications retain an immutable audit log with cryptographic or timestamped tokens? This is required for our NIST AI RMF audit compliance.\n\nThanks,\nDr. Elena Rostova\nPrincipal Safety Auditor",
+          "snippet": "Could you confirm whether all external communications retain an immutable audit log...",
+          "date": "2026-11-23T09:00:00.000Z",
+          "isUnread": false,
+          "isImportant": true,
+          "hasAttachments": false,
+          "labels": [
+            "INBOX",
+            "IMPORTANT",
+            "SECURITY"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "thread_research_03",
+      "subject": "Clean Energy & Perovskite Solar Cells Synthesis Summary",
+      "snippet": "The tandem perovskite-silicon cell test report demonstrates 33.9% power conversion efficiency...",
+      "lastMessageDate": "2026-11-22T04:15:00.000Z",
+      "participantEmails": [
+        "dr.aravind@cleanenergy-lab.org",
+        "user@jarvis-os.ai"
+      ],
+      "isImportant": false,
+      "isUnread": false,
+      "labels": [
+        "INBOX",
+        "RESEARCH"
+      ],
+      "messages": [
+        {
+          "id": "msg_03_a",
+          "threadId": "thread_research_03",
+          "sender": "Dr. Aravind Sundaram",
+          "senderEmail": "dr.aravind@cleanenergy-lab.org",
+          "recipient": "JARVIS Research Hub",
+          "recipientEmail": "user@jarvis-os.ai",
+          "subject": "Clean Energy & Perovskite Solar Cells Synthesis Summary",
+          "body": "Hi,\n\nFollowing up on our renewable energy query, the test reports for the dual-junction tandem cells have concluded. The certified lab results show stable operation exceeding 1,000 hours with negligible degradation under accelerated thermal cycling.\n\nI have attached the dataset summary table for ingestion into JARVIS knowledge database.\n\nWarm regards,\nAravind",
+          "snippet": "The test reports for the dual-junction tandem cells have concluded...",
+          "date": "2026-11-22T04:15:00.000Z",
+          "isUnread": false,
+          "isImportant": false,
+          "hasAttachments": true,
+          "attachments": [
+            {
+              "id": "att_02",
+              "filename": "Perovskite_Tandem_Data_Summary.csv",
+              "mimeType": "text/csv",
+              "sizeBytes": 81920
+            }
+          ],
+          "labels": [
+            "INBOX",
+            "RESEARCH"
+          ]
+        }
+      ]
+    }
+  ],
+  "drafts": [
+    {
+      "id": "draft_1795533258677_elzk",
+      "to": "judge@hackathon.org",
+      "subject": "JARVIS Demo",
+      "body": "Ready for judging.",
+      "createdAt": "2026-11-24T15:14:18.677Z",
+      "updatedAt": "2026-11-24T15:14:18.677Z"
+    },
+    {
+      "id": "draft_01",
+      "to": "judging-committee@ai-hackathon.org",
+      "subject": "Re: Final Pitch Deck Submission & Demo Day Logistics",
+      "body": "Dear Track Committee,\n\nThank you for the notification. We are pleased to confirm that JARVIS — The Time Traveller is ready for live evaluation.\n\nOur public live demo endpoint: https://jarvis-chaos.vercel.app\n\nAttached is our latest executive briefing.\n\nBest regards,\nJARVIS Core Team",
+      "createdAt": "2026-11-24T05:30:00.000Z",
+      "updatedAt": "2026-11-24T06:00:00.000Z"
+    }
+  ],
+  "dispatches": [
+    {
+      "confirmationToken": "auth_gate_1795533258680_56cssnb2",
+      "to": "judge@hackathon.org",
+      "subject": "JARVIS Demo",
+      "body": "Ready for judging.",
+      "createdAt": "2026-11-24T15:14:18.680Z",
+      "expiresAt": "2026-11-24T15:29:18.680Z",
+      "status": "dispatched",
+      "dispatchResult": {
+        "success": true,
+        "providerId": "gmail_msg_1795533258682_xjaz35",
+        "dispatchedAt": "2026-11-24T15:14:18.682Z",
+        "message": "Message dispatched successfully from user@jarvis-os.ai to judge@hackathon.org"
+      }
+    }
+  ],
+  "connectedAccount": {
+    "email": "user@jarvis-os.ai",
+    "displayName": "JARVIS Authorized Operator",
+    "isConnected": true,
+    "tokenExpiry": "2026-12-24T15:14:18.670Z",
+    "scope": [
+      "https://www.googleapis.com/auth/gmail.readonly",
+      "https://www.googleapis.com/auth/gmail.compose",
+      "https://www.googleapis.com/auth/gmail.send"
+    ]
+  }
+}

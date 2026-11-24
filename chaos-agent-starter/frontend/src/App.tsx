@@ -57,6 +57,7 @@ import { PromptWaveBackground } from './PromptWaveBackground';
 import { SmartTaskManager } from './SmartTaskManager';
 import { BeatProcrastination } from './BeatProcrastination';
 import { MemoryVault } from './MemoryVault';
+import { GmailMcpHub } from './GmailMcpHub';
 
 // Data Models
 export interface ChatAttachment {
@@ -1238,7 +1239,7 @@ export default function App() {
             onClick={() => handleNavClick('email')}
           >
             <Mail size={17} />
-            <span>Email Composer</span>
+            <span>Gmail MCP Hub</span>
           </button>
 
           <button
@@ -1316,7 +1317,7 @@ export default function App() {
               {activeTab === 'gamification' && 'Beat Procrastination & Gamification Hub'}
               {activeTab === 'memories' && 'Memory Vault — Goals & Principles'}
               {activeTab === 'studio' && 'Document Studio'}
-              {activeTab === 'email' && 'Email Composer'}
+              {activeTab === 'email' && 'Gmail MCP Intelligence Hub'}
               {activeTab === 'documents' && 'My Documents'}
               {activeTab === 'settings' && 'Profile & Settings'}
               {activeTab === 'orchestrator' && 'Multi-Step Task Orchestrator'}
@@ -2308,161 +2309,10 @@ export default function App() {
         )}
 
         {/* ========================================================== */}
-        {/* MODULE 5: EMAIL COMPOSER                                   */}
+        {/* FEATURE 1: GMAIL MCP INTEGRATION & INTELLIGENCE HUB         */}
         {/* ========================================================== */}
         {activeTab === 'email' && (
-          <div className="email-container">
-            <div className="email-card-box">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Mail size={18} color="var(--primary)" />
-                  <strong style={{ fontSize: 16 }}>Dispatch Verified Intelligence Email</strong>
-                </div>
-                <span style={{ fontSize: 11, background: 'var(--primary-subtle)', color: 'var(--primary-text)', padding: '3px 8px', borderRadius: 9999, fontWeight: 600 }}>
-                  Gate Confirmed Mode
-                </span>
-              </div>
-
-              {/* Quick populate dropdown */}
-              <div className="form-group">
-                <label className="form-label">Extract Body from Active Conversation</label>
-                <select
-                  className="form-control"
-                  onChange={e => {
-                    const conv = conversations.find(c => c.id === e.target.value);
-                    if (conv) {
-                      setEmailSubject(`Briefing: ${conv.title}`);
-                      const assistantText = conv.messages.filter(m => m.role === 'assistant').slice(-1)[0]?.content || '';
-                      setEmailBody(cleanAnswerText(assistantText));
-                    }
-                  }}
-                  defaultValue={currentConvId}
-                >
-                  <option value="">-- Choose conversation --</option>
-                  {conversations.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Recipient Email Address</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={emailTo}
-                  onChange={e => setEmailTo(e.target.value)}
-                  placeholder="recipient@organization.com"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Subject Line</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={emailSubject}
-                  onChange={e => setEmailSubject(e.target.value)}
-                  placeholder="Briefing subject"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Email Message Body</label>
-                <textarea
-                  className="form-control"
-                  style={{ minHeight: 180, resize: 'vertical' }}
-                  value={emailBody}
-                  onChange={e => setEmailBody(e.target.value)}
-                  placeholder="Enter message body or research summary..."
-                  required
-                />
-              </div>
-
-              {/* Provider Response Notification */}
-              {emailProviderStatus && (
-                <div
-                  style={{
-                    padding: 14,
-                    borderRadius: 10,
-                    fontSize: 13,
-                    background: emailProviderStatus.success ? 'var(--secondary-subtle)' : 'var(--amber-subtle)',
-                    border: `1px solid ${emailProviderStatus.success ? '#a7f3d0' : '#fde68a'}`,
-                    color: emailProviderStatus.success ? 'var(--secondary-text)' : '#b45309'
-                  }}
-                >
-                  <div style={{ fontWeight: 700 }}>
-                    {emailProviderStatus.success ? '✓ Provider Accepted' : 'Notice: Provider Status'}
-                  </div>
-                  <div style={{ marginTop: 2 }}>{emailProviderStatus.message}</div>
-                  {emailProviderStatus.refId && (
-                    <div style={{ marginTop: 4, fontFamily: 'monospace', fontSize: 11 }}>
-                      Reference ID: {emailProviderStatus.refId}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Explicit Gate Warning per AGENTS.md rule 8 */}
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                🔒 <strong>Explicit Confirmation Policy:</strong> In compliance with workspace rules, sending requires your explicit confirmation modal approval before any network dispatch is initiated.
-              </div>
-
-              <button
-                className="btn-primary"
-                style={{ padding: '12px 20px', justifyContent: 'center' }}
-                onClick={() => {
-                  if (!emailTo.trim() || !emailSubject.trim() || !emailBody.trim()) {
-                    alert('Please complete recipient, subject, and message body.');
-                    return;
-                  }
-                  setShowEmailConfirmModal(true);
-                }}
-                disabled={isSendingEmail}
-              >
-                <Send size={16} />
-                <span>{isSendingEmail ? 'Dispatching…' : 'Review & Confirm Email Dispatch'}</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Explicit Confirmation Modal */}
-        {showEmailConfirmModal && (
-          <div className="modal-overlay" onClick={() => setShowEmailConfirmModal(false)}>
-            <div className="modal-box" onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--amber-subtle)', display: 'grid', placeItems: 'center', color: '#d97706' }}>
-                  <Shield size={20} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: 16 }}>Confirm External Email Dispatch</h3>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Explicit confirmation required</span>
-                </div>
-              </div>
-
-              <div style={{ background: 'var(--bg-surface-muted)', padding: 14, borderRadius: 10, fontSize: 13, marginBottom: 16 }}>
-                <div style={{ marginBottom: 6 }}><strong>Recipient:</strong> {emailTo}</div>
-                <div style={{ marginBottom: 6 }}><strong>Subject:</strong> {emailSubject}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', maxHeight: 100, overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
-                  {emailBody.slice(0, 300)}...
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button className="btn-secondary" onClick={() => setShowEmailConfirmModal(false)}>
-                  Cancel
-                </button>
-                <button className="btn-primary" onClick={executeSendEmail}>
-                  Confirm & Dispatch
-                </button>
-              </div>
-            </div>
-          </div>
+          <GmailMcpHub apiBaseUrl={API} onNavigateToTab={(tab) => setActiveTab(tab as NavTab)} />
         )}
 
         {/* ========================================================== */}

@@ -62,6 +62,20 @@ import {
   unlinkTaskFromMemory,
   getMemoriesForTask
 } from './memoryVaultDatabase.js';
+import {
+  searchEmails,
+  getThreadById,
+  getMessageById,
+  summarizeEmailThread,
+  createDraft,
+  listDrafts,
+  deleteDraft,
+  prepareEmailDispatch,
+  confirmAndDispatchEmail,
+  getGmailStore,
+  GMAIL_MCP_TOOLS,
+  executeGmailMcpTool
+} from './gmailMcpService.js';
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -930,6 +944,186 @@ app.post('/api/email', async (req, res) => {
     console.error('Email request failed; outcome may require provider reconciliation.');
     res.status(502).json({ error: 'Email outcome could not be confirmed. Check provider status before retrying to avoid duplicates.' });
   }
+});
+
+// ==========================================================
+// FEATURE 1 – GMAIL MCP INTEGRATION & PROTOCOL ENDPOINTS
+// ==========================================================
+
+// 1. Account Status
+app.get('/api/gmail/account', (_req, res) => {
+  try {
+    const store = getGmailStore();
+    res.json({ ok: true, account: store.connectedAccount });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 2. Search & List Threads
+app.get('/api/gmail/threads', (req, res) => {
+  try {
+    const { q, query, sender, subject, after, before, isImportant, hasAttachment } = req.query;
+    const searchResult = searchEmails({
+      query: (q as string) || (query as string) || undefined,
+      sender: (sender as string) || undefined,
+      subject: (subject as string) || undefined,
+      after: (after as string) || undefined,
+      before: (before as string) || undefined,
+      isImportant: isImportant !== undefined ? isImportant === 'true' : undefined,
+      hasAttachment: hasAttachment !== undefined ? hasAttachment === 'true' : undefined
+    });
+    res.json({ ok: true, count: searchResult.totalCount, threads: searchResult.threads });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 3. Get Thread Details with all messages & attachments
+app.get('/api/gmail/threads/:id', (req, res) => {
+  try {
+    const thread = getThreadById(req.params.id);
+    if (!thread) return res.status(404).json({ ok: false, error: 'Email thread not found.' });
+    res.json({ ok: true, thread });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 4. Summarize Email Thread with AI Synthesis
+app.post('/api/gmail/threads/:id/summarize', async (req, res) => {
+  try {
+    const summary = await summarizeEmailThread(req.params.id, openai);
+    res.json({ ok: true, summary });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 5. Drafts Management
+app.get('/api/gmail/drafts', (_req, res) => {
+  try {
+    res.json({ ok: true, drafts: listDrafts() });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/gmail/drafts', (req, res) => {
+  try {
+    const { to, subject, body } = req.body;
+    if (!to || !subject || !body) {
+      return res.status(400).json({ ok: false, error: 'Recipient, subject, and body are required.' });
+    }
+    const draft = createDraft({ to, subject, body });
+    res.json({ ok: true, draft });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.delete('/api/gmail/drafts/:id', (req, res) => {
+  try {
+    const deleted = deleteDraft(req.params.id);
+    res.json({ ok: true, deleted });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 6. Security Send Gate: Prepare Send Session (15-min authorization token)
+app.post('/api/gmail/prepare-send', (req, res) => {
+  try {
+    const { to, subject, body } = req.body;
+    if (!to || !subject || !body) {
+      return res.status(400).json({ ok: false, error: 'Recipient, subject, and body are required to prepare dispatch.' });
+    }
+    const session = prepareEmailDispatch({ to, subject, body });
+    res.json({
+      ok: true,
+      session,
+      message: 'Dispatch authorization session generated. Explicit human confirmation required.'
+    });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 7. Security Send Gate: Confirm and Dispatch with explicit user approval
+app.post('/api/gmail/confirm-send', (req, res) => {
+  try {
+    const { confirmationToken, userApproved } = req.body;
+    if (!confirmationToken) {
+      return res.status(400).json({ ok: false, error: 'confirmationToken is required.' });
+    }
+    const result = confirmAndDispatchEmail(confirmationToken, Boolean(userApproved));
+    if (!result.success) {
+      return res.status(400).json({ ok: false, ...result });
+    }
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 8. Model Context Protocol (MCP) JSON-RPC 2.0 Endpoint
+app.post('/api/mcp/gmail', async (req, res) => {
+  const { jsonrpc, id, method, params } = req.body || {};
+  if (jsonrpc !== '2.0') {
+    return res.status(400).json({
+      jsonrpc: '2.0',
+      id: id ?? null,
+      error: { code: -32600, message: 'Invalid Request: jsonrpc must be "2.0"' }
+    });
+  }
+
+  if (method === 'tools/list') {
+    return res.json({
+      jsonrpc: '2.0',
+      id,
+      result: {
+        tools: GMAIL_MCP_TOOLS
+      }
+    });
+  }
+
+  if (method === 'tools/call') {
+    const { name, arguments: toolArgs } = params || {};
+    try {
+      const outcome = await executeGmailMcpTool(name, toolArgs, openai);
+      if (outcome.isError) {
+        return res.json({
+          jsonrpc: '2.0',
+          id,
+          error: { code: -32602, message: String(outcome.result) }
+        });
+      }
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        result: {
+          content: [
+            {
+              type: 'text',
+              text: typeof outcome.result === 'string' ? outcome.result : JSON.stringify(outcome.result, null, 2)
+            }
+          ]
+        }
+      });
+    } catch (toolErr: any) {
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32603, message: toolErr.message || 'Internal MCP tool execution error' }
+      });
+    }
+  }
+
+  return res.status(404).json({
+    jsonrpc: '2.0',
+    id,
+    error: { code: -32601, message: `Method '${method}' not found` }
+  });
 });
 
 // ==========================================================

@@ -6,7 +6,9 @@ import './styles.css';
 // Register PWA service worker for offline caching and desktop app installability
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      reg.update();
+    }).catch(err => {
       console.warn('PWA service worker registration note:', err);
     });
   });

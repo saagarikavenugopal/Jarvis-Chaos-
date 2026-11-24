@@ -52,6 +52,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { LoginPage } from './LoginPage';
+import { LandingPage } from './LandingPage';
 import { VoiceModeModal } from './VoiceModeModal';
 import { MultiStepTaskRunner } from './MultiStepTaskRunner';
 import { CrossDeviceHandover } from './CrossDeviceHandover';
@@ -229,6 +230,8 @@ export default function App() {
     return localStorage.getItem('chaos-auth-status') === 'authenticated';
   });
 
+  const [showLoginPage, setShowLoginPage] = useState<boolean>(false);
+
   // Module 6: User Profile & Preferences
   const [userName, setUserName] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -254,6 +257,7 @@ export default function App() {
   const handleSignOut = () => {
     localStorage.removeItem('chaos-auth-status');
     setIsAuthenticated(false);
+    setShowLoginPage(false);
   };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -1093,12 +1097,19 @@ export default function App() {
     alert('Workspace reset to clean initial state.');
   };
 
-  // Authentication Gate - displays Login Page when not signed in
+  // Authentication Gate - displays Landing Page first, then Login Page when Get Started is clicked
   if (!isAuthenticated) {
+    if (!showLoginPage) {
+      return (
+        <LandingPage
+          onGetStarted={() => setShowLoginPage(true)}
+        />
+      );
+    }
     return (
       <LoginPage
         onBack={() => {
-          setIsAuthenticated(true);
+          setShowLoginPage(false);
         }}
         onSuccess={(user) => {
           setIsAuthenticated(true);

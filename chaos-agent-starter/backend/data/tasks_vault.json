@@ -1,0 +1,183 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-11-24T13:43:29.236Z",
+  "tasks": [
+    {
+      "id": "task_sample_01",
+      "title": "Complete autonomous agent architecture documentation",
+      "description": "Finalize multi-step pipeline specifications, failure-recovery diagrams, and API endpoints.",
+      "priority": "urgent",
+      "dueDate": "2026-11-24",
+      "dueTime": "17:00",
+      "category": "Documentation",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "sub_01_1",
+          "title": "Document cross-device PWA synchronization protocol",
+          "completed": true
+        },
+        {
+          "id": "sub_01_2",
+          "title": "Detail self-healing anomaly detection algorithms",
+          "completed": true
+        },
+        {
+          "id": "sub_01_3",
+          "title": "Add OpenAPI specifications for smart task routes",
+          "completed": true
+        },
+        {
+          "id": "sub_1795527804651_0",
+          "title": "Define scope, deliverables, and acceptance criteria for project",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527804651_1",
+          "title": "Execute core technical implementation and integrate dependencies",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527804651_2",
+          "title": "Conduct end-to-end testing, error recovery, and verification",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527804651_3",
+          "title": "Finalize review, document changes, and deploy",
+          "completed": false
+        }
+      ],
+      "createdAt": "2026-11-22T12:57:18.011Z",
+      "updatedAt": "2026-11-24T13:43:29.236Z",
+      "source": "manual",
+      "tags": [
+        "architecture",
+        "specs"
+      ],
+      "completedAt": null
+    },
+    {
+      "id": "task_sample_02",
+      "title": "Prepare hackathon slide deck and live demo script",
+      "description": "Structure 3-minute executive pitch covering JARVIS autonomous time-traveller agent capabilities.",
+      "priority": "high",
+      "dueDate": "2026-11-27",
+      "dueTime": "11:00",
+      "category": "Work",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "sub_02_1",
+          "title": "Draft hook and mission statement",
+          "completed": false
+        },
+        {
+          "id": "sub_02_2",
+          "title": "Record 45-second offline recovery demo video",
+          "completed": false
+        },
+        {
+          "id": "sub_02_3",
+          "title": "Prepare interactive Q&A response cards",
+          "completed": false
+        }
+      ],
+      "createdAt": "2026-11-23T12:57:18.012Z",
+      "updatedAt": "2026-11-24T12:57:18.012Z",
+      "source": "natural_language",
+      "tags": [
+        "pitch",
+        "hackathon"
+      ]
+    },
+    {
+      "id": "task_sample_03",
+      "title": "Submit quarterly security audit report",
+      "description": "Audit citation integrity checks, human-in-the-loop email gates, and API key protection.",
+      "priority": "urgent",
+      "dueDate": "2026-11-23",
+      "dueTime": "18:00",
+      "category": "Security",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "sub_03_1",
+          "title": "Run penetration tests on backend endpoints",
+          "completed": true
+        },
+        {
+          "id": "sub_03_2",
+          "title": "Export PDF security compliance audit certificate",
+          "completed": false
+        }
+      ],
+      "createdAt": "2026-11-21T12:57:18.012Z",
+      "updatedAt": "2026-11-24T12:57:18.012Z",
+      "source": "manual",
+      "tags": [
+        "security",
+        "compliance"
+      ]
+    },
+    {
+      "id": "task_sample_04",
+      "title": "Test WebGL neural voice sphere shader on mobile devices",
+      "description": "Verify 60fps frame rate and audio frequency telemetry across iOS and Android browsers.",
+      "priority": "medium",
+      "dueDate": "2026-11-29",
+      "dueTime": "15:30",
+      "category": "Development",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "id": "sub_04_1",
+          "title": "Profile GPU memory allocation in Chrome DevTools",
+          "completed": true
+        },
+        {
+          "id": "sub_04_2",
+          "title": "Verify Web Audio API microphone permissions flow",
+          "completed": false
+        }
+      ],
+      "createdAt": "2026-11-20T12:57:18.012Z",
+      "updatedAt": "2026-11-24T12:57:18.012Z",
+      "source": "manual",
+      "tags": [
+        "mobile",
+        "webgl"
+      ]
+    },
+    {
+      "id": "task_sample_05",
+      "title": "Setup cross-device QR code instant pairing gateway",
+      "description": "Implement geometric SVG QR code generator with embedded cybernetic logo for mobile handover.",
+      "priority": "low",
+      "dueDate": "",
+      "dueTime": "",
+      "category": "Development",
+      "status": "completed",
+      "subtasks": [
+        {
+          "id": "sub_05_1",
+          "title": "Generate high-contrast SVG matrix",
+          "completed": true
+        },
+        {
+          "id": "sub_05_2",
+          "title": "Test LAN IP resolution",
+          "completed": true
+        }
+      ],
+      "createdAt": "2026-11-19T12:57:18.012Z",
+      "updatedAt": "2026-11-24T12:57:18.012Z",
+      "completedAt": "2026-11-22T12:57:18.012Z",
+      "source": "manual",
+      "tags": [
+        "pwa",
+        "sync"
+      ]
+    }
+  ]
+}

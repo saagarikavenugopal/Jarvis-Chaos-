@@ -1,0 +1,107 @@
+{
+  "events": [
+    {
+      "id": "event_hackathon_demo",
+      "title": "JARVIS Final Demo & Track Judging Presentation",
+      "description": "Autonomous Agents Track live presentation and code walk-through. Present cross-device handover, deterministic self-healing recovery, and gamified productivity.",
+      "startTime": "2026-11-24T04:30:00.000Z",
+      "endTime": "2026-11-24T05:30:00.000Z",
+      "attendees": [
+        "jarvispersonalai170@gmail.com",
+        "judging-committee@ai-hackathon.org",
+        "track-lead@ai-hackathon.org"
+      ],
+      "location": "Virtual Main Stage / Google Meet",
+      "meetLink": "https://meet.google.com/jrv-hack-demo",
+      "isAllDay": false,
+      "priority": "high",
+      "status": "confirmed",
+      "organizerEmail": "judging-committee@ai-hackathon.org",
+      "category": "Hackathon"
+    },
+    {
+      "id": "event_focus_sprint",
+      "title": "Deep Work Sprint: Procrastination Prevention Tuning",
+      "description": "Undistracted focus block: Review XP idempotency and Memory Vault integration with task system.",
+      "startTime": "2026-11-24T08:30:00.000Z",
+      "endTime": "2026-11-24T11:00:00.000Z",
+      "attendees": [
+        "jarvispersonalai170@gmail.com"
+      ],
+      "location": "JARVIS Local Workspace",
+      "isAllDay": false,
+      "priority": "medium",
+      "status": "confirmed",
+      "organizerEmail": "jarvispersonalai170@gmail.com",
+      "category": "Deep Work"
+    },
+    {
+      "id": "event_mentor_sync",
+      "title": "Google Cloud & MCP Architecture Mentorship Sync",
+      "description": "Discuss production deployment optimizations, OAuth2 scope security, and zero-shaming productivity nudges.",
+      "startTime": "2026-11-25T10:30:00.000Z",
+      "endTime": "2026-11-25T11:30:00.000Z",
+      "attendees": [
+        "jarvispersonalai170@gmail.com",
+        "mentor-lead@google.com"
+      ],
+      "location": "Google Meet",
+      "meetLink": "https://meet.google.com/mnt-sync-2026",
+      "isAllDay": false,
+      "priority": "high",
+      "status": "confirmed",
+      "organizerEmail": "mentor-lead@google.com",
+      "category": "Sync"
+    },
+    {
+      "id": "event_closing_ceremony",
+      "title": "Hackathon Winner Announcements & Awards Gala",
+      "description": "Awards ceremony for top autonomous agent prototypes.",
+      "startTime": "2026-11-26T12:30:00.000Z",
+      "endTime": "2026-11-26T14:30:00.000Z",
+      "attendees": [
+        "jarvispersonalai170@gmail.com",
+        "all-participants@ai-hackathon.org"
+      ],
+      "location": "Live Stream Auditorium",
+      "meetLink": "https://meet.google.com/gala-stream-live",
+      "isAllDay": false,
+      "priority": "high",
+      "status": "confirmed",
+      "organizerEmail": "committee@ai-hackathon.org",
+      "category": "Hackathon"
+    }
+  ],
+  "dispatchSessions": [
+    {
+      "confirmationToken": "cal_gate_1795534542573_aga6pn",
+      "action": "create",
+      "eventData": {
+        "title": "Final AI Review",
+        "startTime": "2026-11-24T15:35:42.572Z",
+        "endTime": "2026-11-24T16:35:42.572Z"
+      },
+      "createdAt": "2026-11-24T15:35:42.573Z",
+      "expiresAt": "2026-11-24T15:50:42.573Z",
+      "status": "dispatched",
+      "dispatchResult": {
+        "success": true,
+        "eventId": "event_1795534542576_fzjk",
+        "message": "Event \"Final AI Review\" scheduled via Google Calendar account (jarvispersonalai170@gmail.com).",
+        "dispatchedAt": "2026-11-24T15:35:42.577Z"
+      }
+    }
+  ],
+  "connectedAccount": {
+    "email": "jarvispersonalai170@gmail.com",
+    "displayName": "JARVIS Authorized Operator",
+    "isConnected": true,
+    "timeZone": "Asia/Calcutta",
+    "tokenExpiry": "2026-12-24T15:35:42.575Z",
+    "scope": [
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "https://www.googleapis.com/auth/calendar.events",
+      "https://www.googleapis.com/auth/calendar.freebusy"
+    ]
+  }
+}

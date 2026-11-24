@@ -48,6 +48,8 @@ import {
   Flame,
   Compass,
   Trophy,
+  HardDrive,
+  Calendar,
 } from 'lucide-react';
 import { LoginPage } from './LoginPage';
 import { VoiceModeModal } from './VoiceModeModal';
@@ -58,6 +60,8 @@ import { SmartTaskManager } from './SmartTaskManager';
 import { BeatProcrastination } from './BeatProcrastination';
 import { MemoryVault } from './MemoryVault';
 import { GmailMcpHub } from './GmailMcpHub';
+import { GoogleDriveMcpHub } from './GoogleDriveMcpHub';
+import { GoogleCalendarMcpHub } from './GoogleCalendarMcpHub';
 
 // Data Models
 export interface ChatAttachment {
@@ -113,7 +117,7 @@ interface GeneratedDoc {
 
 const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:4000');
 
-export type NavTab = 'workspace' | 'history' | 'tasks' | 'gamification' | 'memories' | 'studio' | 'email' | 'documents' | 'settings' | 'orchestrator' | 'devices';
+export type NavTab = 'workspace' | 'history' | 'tasks' | 'gamification' | 'memories' | 'studio' | 'email' | 'gdrive' | 'gcalendar' | 'documents' | 'settings' | 'orchestrator' | 'devices';
 
 export default function App() {
   // Navigation View
@@ -1243,6 +1247,22 @@ export default function App() {
           </button>
 
           <button
+            className={`nav-btn ${activeTab === 'gdrive' ? 'active' : ''}`}
+            onClick={() => handleNavClick('gdrive')}
+          >
+            <HardDrive size={17} />
+            <span>Google Drive Hub</span>
+          </button>
+
+          <button
+            className={`nav-btn ${activeTab === 'gcalendar' ? 'active' : ''}`}
+            onClick={() => handleNavClick('gcalendar')}
+          >
+            <Calendar size={17} />
+            <span>Google Calendar</span>
+          </button>
+
+          <button
             className={`nav-btn ${activeTab === 'documents' ? 'active' : ''}`}
             onClick={() => handleNavClick('documents')}
           >
@@ -1318,6 +1338,8 @@ export default function App() {
               {activeTab === 'memories' && 'Memory Vault — Goals & Principles'}
               {activeTab === 'studio' && 'Document Studio'}
               {activeTab === 'email' && 'Gmail MCP Intelligence Hub'}
+              {activeTab === 'gdrive' && 'Google Drive MCP Storage Hub'}
+              {activeTab === 'gcalendar' && 'Google Calendar MCP Hub & Schedule Optimizer'}
               {activeTab === 'documents' && 'My Documents'}
               {activeTab === 'settings' && 'Profile & Settings'}
               {activeTab === 'orchestrator' && 'Multi-Step Task Orchestrator'}
@@ -2313,6 +2335,20 @@ export default function App() {
         {/* ========================================================== */}
         {activeTab === 'email' && (
           <GmailMcpHub apiBaseUrl={API} onNavigateToTab={(tab) => setActiveTab(tab as NavTab)} />
+        )}
+
+        {/* ========================================================== */}
+        {/* GOOGLE DRIVE MCP STORAGE HUB                                */}
+        {/* ========================================================== */}
+        {activeTab === 'gdrive' && (
+          <GoogleDriveMcpHub apiBaseUrl={API} onNavigateToTab={(tab) => setActiveTab(tab as NavTab)} />
+        )}
+
+        {/* ========================================================== */}
+        {/* GOOGLE CALENDAR MCP HUB & SCHEDULE OPTIMIZER                */}
+        {/* ========================================================== */}
+        {activeTab === 'gcalendar' && (
+          <GoogleCalendarMcpHub apiBaseUrl={API} onNavigateToTab={(tab) => setActiveTab(tab as NavTab)} />
         )}
 
         {/* ========================================================== */}

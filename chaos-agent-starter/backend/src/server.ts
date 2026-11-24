@@ -76,6 +76,29 @@ import {
   GMAIL_MCP_TOOLS,
   executeGmailMcpTool
 } from './gmailMcpService.js';
+import {
+  searchDriveFiles,
+  getDriveFileById,
+  summarizeDriveFile,
+  createDriveFile,
+  deleteDriveFile,
+  prepareShareDriveFile,
+  confirmAndShareDriveFile,
+  getDriveStore,
+  GDRIVE_MCP_TOOLS,
+  executeDriveMcpTool
+} from './googleDriveMcpService.js';
+import {
+  searchCalendarEvents,
+  getCalendarEventById,
+  generateScheduleBriefing,
+  createCalendarEvent,
+  prepareEventDispatch,
+  confirmAndDispatchEvent,
+  getCalendarStore,
+  GCALENDAR_MCP_TOOLS,
+  executeCalendarMcpTool
+} from './googleCalendarMcpService.js';
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -1124,6 +1147,270 @@ app.post('/api/mcp/gmail', async (req, res) => {
     id,
     error: { code: -32601, message: `Method '${method}' not found` }
   });
+});
+
+// ==========================================================
+// FEATURE: GOOGLE DRIVE MCP INTEGRATION & PROTOCOL ENDPOINTS
+// ==========================================================
+
+// 1. Account & Quota Status
+app.get('/api/drive/account', (_req, res) => {
+  try {
+    const store = getDriveStore();
+    res.json({ ok: true, account: store.connectedAccount, quota: store.quota });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 2. Search & List Files
+app.get('/api/drive/files', (req, res) => {
+  try {
+    const { q, query, mimeType, starred } = req.query;
+    const result = searchDriveFiles({
+      query: (q as string) || (query as string) || undefined,
+      mimeType: (mimeType as string) || undefined,
+      starred: starred !== undefined ? starred === 'true' : undefined
+    });
+    res.json({ ok: true, count: result.totalCount, files: result.files });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 3. File Detail
+app.get('/api/drive/files/:id', (req, res) => {
+  try {
+    const file = getDriveFileById(req.params.id);
+    if (!file) return res.status(404).json({ ok: false, error: 'File not found.' });
+    res.json({ ok: true, file });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 4. Summarize File with AI
+app.post('/api/drive/files/:id/summarize', async (req, res) => {
+  try {
+    const summary = await summarizeDriveFile(req.params.id, openai);
+    res.json({ ok: true, summary });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 5. Create / Upload File
+app.post('/api/drive/files', (req, res) => {
+  try {
+    const { name, content, mimeType, tags } = req.body;
+    if (!name || !content) {
+      return res.status(400).json({ ok: false, error: 'File name and content are required.' });
+    }
+    const file = createDriveFile({ name, content, mimeType, tags });
+    res.json({ ok: true, file });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 6. Delete File
+app.delete('/api/drive/files/:id', (req, res) => {
+  try {
+    const deleted = deleteDriveFile(req.params.id);
+    res.json({ ok: true, deleted });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 7. Security Gate: Prepare Share Session
+app.post('/api/drive/prepare-share', (req, res) => {
+  try {
+    const { fileId, recipientEmail, role } = req.body;
+    if (!fileId || !recipientEmail) {
+      return res.status(400).json({ ok: false, error: 'fileId and recipientEmail are required.' });
+    }
+    const session = prepareShareDriveFile({ fileId, recipientEmail, role });
+    res.json({ ok: true, session, message: 'Share authorization session created.' });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 8. Security Gate: Confirm and Share
+app.post('/api/drive/confirm-share', (req, res) => {
+  try {
+    const { confirmationToken, userApproved } = req.body;
+    if (!confirmationToken) {
+      return res.status(400).json({ ok: false, error: 'confirmationToken is required.' });
+    }
+    const result = confirmAndShareDriveFile(confirmationToken, Boolean(userApproved));
+    if (!result.success) return res.status(400).json({ ok: false, ...result });
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 9. Google Drive MCP JSON-RPC 2.0 Endpoint
+app.post('/api/mcp/drive', async (req, res) => {
+  const { jsonrpc, id, method, params } = req.body || {};
+  if (jsonrpc !== '2.0') {
+    return res.status(400).json({ jsonrpc: '2.0', id: id ?? null, error: { code: -32600, message: 'Invalid Request: jsonrpc must be "2.0"' } });
+  }
+
+  if (method === 'tools/list') {
+    return res.json({ jsonrpc: '2.0', id, result: { tools: GDRIVE_MCP_TOOLS } });
+  }
+
+  if (method === 'tools/call') {
+    const { name, arguments: toolArgs } = params || {};
+    try {
+      const outcome = await executeDriveMcpTool(name, toolArgs, openai);
+      if (outcome.isError) {
+        return res.json({ jsonrpc: '2.0', id, error: { code: -32602, message: String(outcome.result) } });
+      }
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        result: {
+          content: [{ type: 'text', text: typeof outcome.result === 'string' ? outcome.result : JSON.stringify(outcome.result, null, 2) }]
+        }
+      });
+    } catch (toolErr: any) {
+      return res.json({ jsonrpc: '2.0', id, error: { code: -32603, message: toolErr.message || 'Drive MCP error' } });
+    }
+  }
+
+  return res.status(404).json({ jsonrpc: '2.0', id, error: { code: -32601, message: `Method '${method}' not found` } });
+});
+
+// ==========================================================
+// FEATURE: GOOGLE CALENDAR MCP INTEGRATION & PROTOCOL ENDPOINTS
+// ==========================================================
+
+// 1. Account Status
+app.get('/api/calendar/account', (_req, res) => {
+  try {
+    const store = getCalendarStore();
+    res.json({ ok: true, account: store.connectedAccount });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 2. Search & List Events
+app.get('/api/calendar/events', (req, res) => {
+  try {
+    const { q, query, startDate, endDate, category } = req.query;
+    const result = searchCalendarEvents({
+      query: (q as string) || (query as string) || undefined,
+      startDate: (startDate as string) || undefined,
+      endDate: (endDate as string) || undefined,
+      category: (category as string) || undefined
+    });
+    res.json({ ok: true, count: result.totalCount, events: result.events });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 3. Event Detail
+app.get('/api/calendar/events/:id', (req, res) => {
+  try {
+    const event = getCalendarEventById(req.params.id);
+    if (!event) return res.status(404).json({ ok: false, error: 'Calendar event not found.' });
+    res.json({ ok: true, event });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 4. Daily Schedule Briefing & Focus Blocks
+app.get('/api/calendar/daily-briefing', async (req, res) => {
+  try {
+    const dateStr = req.query.date as string | undefined;
+    const briefing = await generateScheduleBriefing(dateStr, openai);
+    res.json({ ok: true, ...briefing });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 5. Create Event Directly
+app.post('/api/calendar/events', (req, res) => {
+  try {
+    const { title, description, startTime, endTime, attendees, location, generateMeetLink, priority, category } = req.body;
+    if (!title || !startTime || !endTime) {
+      return res.status(400).json({ ok: false, error: 'Title, startTime, and endTime are required.' });
+    }
+    const event = createCalendarEvent({ title, description, startTime, endTime, attendees, location, generateMeetLink, priority, category });
+    res.json({ ok: true, event });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 6. Security Gate: Prepare Event Dispatch
+app.post('/api/calendar/prepare-event', (req, res) => {
+  try {
+    const { action, eventData } = req.body;
+    if (!action || !eventData) {
+      return res.status(400).json({ ok: false, error: 'action and eventData are required.' });
+    }
+    const session = prepareEventDispatch({ action, eventData });
+    res.json({ ok: true, session, message: 'Calendar authorization session created.' });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 7. Security Gate: Confirm and Dispatch
+app.post('/api/calendar/confirm-event', (req, res) => {
+  try {
+    const { confirmationToken, userApproved } = req.body;
+    if (!confirmationToken) {
+      return res.status(400).json({ ok: false, error: 'confirmationToken is required.' });
+    }
+    const result = confirmAndDispatchEvent(confirmationToken, Boolean(userApproved));
+    if (!result.success) return res.status(400).json({ ok: false, ...result });
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 8. Google Calendar MCP JSON-RPC 2.0 Endpoint
+app.post('/api/mcp/calendar', async (req, res) => {
+  const { jsonrpc, id, method, params } = req.body || {};
+  if (jsonrpc !== '2.0') {
+    return res.status(400).json({ jsonrpc: '2.0', id: id ?? null, error: { code: -32600, message: 'Invalid Request: jsonrpc must be "2.0"' } });
+  }
+
+  if (method === 'tools/list') {
+    return res.json({ jsonrpc: '2.0', id, result: { tools: GCALENDAR_MCP_TOOLS } });
+  }
+
+  if (method === 'tools/call') {
+    const { name, arguments: toolArgs } = params || {};
+    try {
+      const outcome = await executeCalendarMcpTool(name, toolArgs, openai);
+      if (outcome.isError) {
+        return res.json({ jsonrpc: '2.0', id, error: { code: -32602, message: String(outcome.result) } });
+      }
+      return res.json({
+        jsonrpc: '2.0',
+        id,
+        result: {
+          content: [{ type: 'text', text: typeof outcome.result === 'string' ? outcome.result : JSON.stringify(outcome.result, null, 2) }]
+        }
+      });
+    } catch (toolErr: any) {
+      return res.json({ jsonrpc: '2.0', id, error: { code: -32603, message: toolErr.message || 'Calendar MCP error' } });
+    }
+  }
+
+  return res.status(404).json({ jsonrpc: '2.0', id, error: { code: -32601, message: `Method '${method}' not found` } });
 });
 
 // ==========================================================

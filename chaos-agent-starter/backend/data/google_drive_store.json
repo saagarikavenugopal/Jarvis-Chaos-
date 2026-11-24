@@ -1,0 +1,111 @@
+{
+  "files": [
+    {
+      "id": "file_pitch_deck",
+      "name": "JARVIS — Autonomous AI Hackathon Pitch Deck.gslides",
+      "mimeType": "application/vnd.google-apps.presentation",
+      "sizeBytes": 8420000,
+      "createdDate": "2026-11-21T15:35:42.540Z",
+      "modifiedDate": "2026-11-24T15:35:42.540Z",
+      "ownerEmail": "jarvispersonalai170@gmail.com",
+      "sharedWith": [
+        "judges@ai-hackathon.org",
+        "collaborator@google.com"
+      ],
+      "starred": true,
+      "webViewLink": "https://docs.google.com/presentation/d/jarvis-pitch-deck/view",
+      "contentPreview": "Slide 1: JARVIS — The Autonomous Agentic Operating System.\nSlide 2: Cross-Device Temporal Handover & Self-Healing Architecture.\nSlide 3: Real-Time MCP Integrations: Gmail, Google Drive, Google Calendar.\nSlide 4: Gamified Productivity & Procrastination Elimination Engine.",
+      "tags": [
+        "Hackathon",
+        "Pitch",
+        "Core"
+      ]
+    },
+    {
+      "id": "file_arch_doc",
+      "name": "JARVIS System Architecture & MCP Gateway Specification.gdoc",
+      "mimeType": "application/vnd.google-apps.document",
+      "sizeBytes": 154000,
+      "createdDate": "2026-11-19T15:35:42.540Z",
+      "modifiedDate": "2026-11-23T15:35:42.540Z",
+      "ownerEmail": "jarvispersonalai170@gmail.com",
+      "sharedWith": [],
+      "starred": true,
+      "webViewLink": "https://docs.google.com/document/d/jarvis-architecture/view",
+      "contentPreview": "Technical specification describing the dual JSON-RPC 2.0 MCP interface, local caching with Supabase cloud synchronizer, and biometric/token-based Human-In-The-Loop security dispatch gates.",
+      "tags": [
+        "Architecture",
+        "Technical",
+        "Docs"
+      ]
+    },
+    {
+      "id": "file_eval_metrics",
+      "name": "Benchmark Results & Model Evaluation Matrix.gsheet",
+      "mimeType": "application/vnd.google-apps.spreadsheet",
+      "sizeBytes": 420000,
+      "createdDate": "2026-11-22T15:35:42.540Z",
+      "modifiedDate": "2026-11-24T15:35:42.540Z",
+      "ownerEmail": "jarvispersonalai170@gmail.com",
+      "sharedWith": [
+        "research@google.com"
+      ],
+      "starred": false,
+      "webViewLink": "https://docs.google.com/spreadsheets/d/jarvis-eval-matrix/view",
+      "contentPreview": "Sheet 1: Latency benchmarks across local Ollama and OpenAI GPT-4.1-mini. Average response time: 240ms. Task parsing accuracy: 98.4% across 120 zero-shot instructions.",
+      "tags": [
+        "Benchmarks",
+        "Data"
+      ]
+    },
+    {
+      "id": "file_whitepaper_pdf",
+      "name": "Procrastination Elimination in Gamified Cognitive Agents.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2450000,
+      "createdDate": "2026-11-17T15:35:42.540Z",
+      "modifiedDate": "2026-11-20T15:35:42.540Z",
+      "ownerEmail": "jarvispersonalai170@gmail.com",
+      "sharedWith": [],
+      "starred": false,
+      "webViewLink": "https://drive.google.com/file/d/procrastination-whitepaper/view",
+      "contentPreview": "Research paper on psychological activation energy, behavioral nudges, and idempotent XP reward algorithms designed to defeat executive dysfunction without shaming.",
+      "tags": [
+        "Research",
+        "Psychology"
+      ]
+    }
+  ],
+  "shareSessions": [
+    {
+      "confirmationToken": "share_gate_1795534542546_yjvf9j",
+      "fileId": "file_pitch_deck",
+      "fileName": "JARVIS — Autonomous AI Hackathon Pitch Deck.gslides",
+      "recipientEmail": "collaborator@google.com",
+      "role": "editor",
+      "createdAt": "2026-11-24T15:35:42.546Z",
+      "expiresAt": "2026-11-24T15:50:42.546Z",
+      "status": "shared",
+      "shareResult": {
+        "success": true,
+        "sharedAt": "2026-11-24T15:35:42.549Z",
+        "message": "File \"JARVIS — Autonomous AI Hackathon Pitch Deck.gslides\" shared with collaborator@google.com (editor)"
+      }
+    }
+  ],
+  "quota": {
+    "usedBytes": 11434000,
+    "totalBytes": 16106127360
+  },
+  "connectedAccount": {
+    "email": "jarvispersonalai170@gmail.com",
+    "displayName": "JARVIS Authorized Operator",
+    "isConnected": true,
+    "tokenExpiry": "2026-12-24T15:35:42.549Z",
+    "scope": [
+      "https://www.googleapis.com/auth/drive.readonly",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/drive.metadata.readonly"
+    ]
+  }
+}

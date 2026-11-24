@@ -135,11 +135,11 @@ export const GmailMcpHub: React.FC<GmailMcpHubProps> = ({ apiBaseUrl, onNavigate
     tokenExpiry: string;
     scope: string[];
   }>({
-    email: 'user@jarvis-os.ai',
+    email: 'jarvispersonalai170@gmail.com',
     displayName: 'Autonomous JARVIS Operator',
     isConnected: true,
     tokenExpiry: new Date(Date.now() + 86400000).toISOString(),
-    scope: ['https://mail.google.com/', 'gmail.readonly', 'gmail.compose', 'gmail.modify']
+    scope: ['https://mail.google.com/', 'gmail.modify', 'gmail.compose', 'gmail.send']
   });
 
   // Fetch threads & account status

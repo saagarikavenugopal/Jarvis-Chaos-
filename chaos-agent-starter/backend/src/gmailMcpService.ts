@@ -204,11 +204,11 @@ function getInitialInbox(): GmailStore {
     drafts,
     dispatches: [],
     connectedAccount: {
-      email: 'user@jarvis-os.ai',
+      email: process.env.GMAIL_USER_EMAIL || 'jarvispersonalai170@gmail.com',
       displayName: 'JARVIS Authorized Operator',
       isConnected: true,
       tokenExpiry: new Date(Date.now() + 86400000 * 30).toISOString(),
-      scope: ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.send']
+      scope: ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/userinfo.email']
     }
   };
 }
@@ -239,12 +239,12 @@ export function getGmailStore(): GmailStore {
       threads: Array.isArray(data.threads) ? data.threads : [],
       drafts: Array.isArray(data.drafts) ? data.drafts : [],
       dispatches: Array.isArray(data.dispatches) ? data.dispatches : [],
-      connectedAccount: data.connectedAccount || {
-        email: 'user@jarvis-os.ai',
+      connectedAccount: data.connectedAccount && data.connectedAccount.email !== 'user@jarvis-os.ai' ? data.connectedAccount : {
+        email: process.env.GMAIL_USER_EMAIL || 'jarvispersonalai170@gmail.com',
         displayName: 'JARVIS Authorized Operator',
         isConnected: true,
         tokenExpiry: new Date(Date.now() + 86400000 * 30).toISOString(),
-        scope: ['https://www.googleapis.com/auth/gmail.readonly', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.send']
+        scope: ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/userinfo.email']
       }
     };
   } catch (err) {

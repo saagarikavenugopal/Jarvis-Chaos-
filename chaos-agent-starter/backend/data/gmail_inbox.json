@@ -203,14 +203,15 @@
     }
   ],
   "connectedAccount": {
-    "email": "user@jarvis-os.ai",
+    "email": "jarvispersonalai170@gmail.com",
     "displayName": "JARVIS Authorized Operator",
     "isConnected": true,
     "tokenExpiry": "2026-12-24T15:14:18.670Z",
     "scope": [
-      "https://www.googleapis.com/auth/gmail.readonly",
+      "https://www.googleapis.com/auth/gmail.modify",
       "https://www.googleapis.com/auth/gmail.compose",
-      "https://www.googleapis.com/auth/gmail.send"
+      "https://www.googleapis.com/auth/gmail.send",
+      "https://www.googleapis.com/auth/userinfo.email"
     ]
   }
 }

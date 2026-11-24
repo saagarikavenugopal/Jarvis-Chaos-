@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-11-24T14:11:32.787Z",
+  "memories": [
+    {
+      "id": "mem_goal_01",
+      "title": "Deliver Flawless Hackathon Presentation & Live Demo",
+      "content": "Demonstrate JARVIS autonomous cross-device handover, deterministic self-healing recovery, and smart task management to judges. Goal is to secure top prize in the Autonomous Agents track.",
+      "category": "Project Goal",
+      "importance": "critical",
+      "goalDeadline": "2026-11-27",
+      "linkedTaskIds": [
+        "task_sample_01",
+        "task_sample_02"
+      ],
+      "tags": [
+        "hackathon",
+        "pitch",
+        "priority"
+      ],
+      "isFavorite": true,
+      "isArchived": false,
+      "createdAt": "2026-11-24T14:10:32.956Z",
+      "updatedAt": "2026-11-24T14:10:32.956Z"
+    },
+    {
+      "id": "mem_principle_02",
+      "title": "Zero User Shaming & Radical Psychological Safety",
+      "content": "Procrastination is an emotional regulation and activation-energy barrier, not a character flaw. Always offer micro-commitments (2-5 minutes) and focus sprints rather than pressure.",
+      "category": "Key Principle",
+      "importance": "high",
+      "goalDeadline": "",
+      "linkedTaskIds": [],
+      "tags": [
+        "psychology",
+        "productivity",
+        "habits"
+      ],
+      "isFavorite": true,
+      "isArchived": false,
+      "createdAt": "2026-11-24T14:10:32.956Z",
+      "updatedAt": "2026-11-24T14:10:32.956Z"
+    },
+    {
+      "id": "mem_vision_03",
+      "title": "Autonomous Personal Operating System Vision",
+      "content": "Evolve JARVIS into a truly agentic temporal operating system that unifies research, multi-step execution, gamified productivity, and long-term memory vault recall.",
+      "category": "Vision",
+      "importance": "high",
+      "goalDeadline": "2026-12-31",
+      "linkedTaskIds": [
+        "task_sample_04",
+        "task_sample_05"
+      ],
+      "tags": [
+        "architecture",
+        "roadmap"
+      ],
+      "isFavorite": false,
+      "isArchived": false,
+      "createdAt": "2026-11-24T14:10:32.956Z",
+      "updatedAt": "2026-11-24T14:10:32.956Z"
+    }
+  ]
+}

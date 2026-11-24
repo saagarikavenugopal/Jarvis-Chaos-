@@ -45,6 +45,9 @@ import {
   Maximize2,
   Eye,
   CheckSquare,
+  Flame,
+  Compass,
+  Trophy,
 } from 'lucide-react';
 import { LoginPage } from './LoginPage';
 import { VoiceModeModal } from './VoiceModeModal';
@@ -52,6 +55,8 @@ import { MultiStepTaskRunner } from './MultiStepTaskRunner';
 import { CrossDeviceHandover } from './CrossDeviceHandover';
 import { PromptWaveBackground } from './PromptWaveBackground';
 import { SmartTaskManager } from './SmartTaskManager';
+import { BeatProcrastination } from './BeatProcrastination';
+import { MemoryVault } from './MemoryVault';
 
 // Data Models
 export interface ChatAttachment {
@@ -107,10 +112,14 @@ interface GeneratedDoc {
 
 const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:4000');
 
+export type NavTab = 'workspace' | 'history' | 'tasks' | 'gamification' | 'memories' | 'studio' | 'email' | 'documents' | 'settings' | 'orchestrator' | 'devices';
+
 export default function App() {
-  // Navigation View: 'workspace' | 'history' | 'tasks' | 'studio' | 'email' | 'documents' | 'settings' | 'orchestrator' | 'devices'
-  const [activeTab, setActiveTab] = useState<'workspace' | 'history' | 'tasks' | 'studio' | 'email' | 'documents' | 'settings' | 'orchestrator' | 'devices'>('workspace');
+  // Navigation View
+  const [activeTab, setActiveTab] = useState<NavTab>('workspace');
   const [urgentTaskCount, setUrgentTaskCount] = useState<number>(0);
+  const [streakCount, setStreakCount] = useState<number>(0);
+  const [memoryCount, setMemoryCount] = useState<number>(0);
   
   // Sidebar open/hide state (Sandwich button)
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
@@ -130,7 +139,7 @@ export default function App() {
     });
   };
 
-  const handleNavClick = (tab: 'workspace' | 'history' | 'tasks' | 'studio' | 'email' | 'documents' | 'settings' | 'orchestrator' | 'devices') => {
+  const handleNavClick = (tab: NavTab) => {
     setActiveTab(tab);
     if (window.innerWidth <= 860) {
       setSidebarOpen(false);
@@ -298,6 +307,22 @@ export default function App() {
           .then(ad => {
             if (ad.ok && ad.analytics) {
               setUrgentTaskCount(ad.analytics.priorityCounts?.urgent || 0);
+            }
+          })
+          .catch(() => {});
+        fetch(`${API}/api/gamification/profile`)
+          .then(r => r.json())
+          .then(gd => {
+            if (gd.ok && gd.streak) {
+              setStreakCount(gd.streak.currentStreak || 0);
+            }
+          })
+          .catch(() => {});
+        fetch(`${API}/api/memories`)
+          .then(r => r.json())
+          .then(md => {
+            if (md.ok && Array.isArray(md.memories)) {
+              setMemoryCount(md.memories.length);
             }
           })
           .catch(() => {});
@@ -1177,6 +1202,30 @@ export default function App() {
           </button>
 
           <button
+            className={`nav-btn ${activeTab === 'gamification' ? 'active' : ''}`}
+            onClick={() => handleNavClick('gamification')}
+          >
+            <Flame size={17} className={activeTab === 'gamification' ? 'text-amber-400' : ''} />
+            <span>Beat Procrastination</span>
+            <span className="nav-badge" style={{ background: 'rgba(245, 158, 11, 0.18)', color: '#fbbf24', fontWeight: 600 }}>
+              {streakCount > 0 ? `${streakCount}d 🔥` : 'XP'}
+            </span>
+          </button>
+
+          <button
+            className={`nav-btn ${activeTab === 'memories' ? 'active' : ''}`}
+            onClick={() => handleNavClick('memories')}
+          >
+            <Compass size={17} className={activeTab === 'memories' ? 'text-cyan-400' : ''} />
+            <span>Memory Vault</span>
+            {memoryCount > 0 && (
+              <span className="nav-badge" style={{ background: 'rgba(6, 182, 212, 0.18)', color: '#22d3ee', fontWeight: 600 }}>
+                {memoryCount}
+              </span>
+            )}
+          </button>
+
+          <button
             className={`nav-btn ${activeTab === 'studio' ? 'active' : ''}`}
             onClick={() => handleNavClick('studio')}
           >
@@ -1264,6 +1313,8 @@ export default function App() {
               {activeTab === 'workspace' && 'Main AI Workspace'}
               {activeTab === 'history' && 'Conversation History'}
               {activeTab === 'tasks' && 'Smart Task Manager & Intelligence'}
+              {activeTab === 'gamification' && 'Beat Procrastination & Gamification Hub'}
+              {activeTab === 'memories' && 'Memory Vault — Goals & Principles'}
               {activeTab === 'studio' && 'Document Studio'}
               {activeTab === 'email' && 'Email Composer'}
               {activeTab === 'documents' && 'My Documents'}
@@ -2093,6 +2144,20 @@ export default function App() {
         {/* ========================================================== */}
         {activeTab === 'tasks' && (
           <SmartTaskManager apiBaseUrl={API} onNavigateToTab={(tab: any) => setActiveTab(tab)} />
+        )}
+
+        {/* ========================================================== */}
+        {/* MODULE: FEATURE 2 - BEAT PROCRASTINATION & GAMIFICATION   */}
+        {/* ========================================================== */}
+        {activeTab === 'gamification' && (
+          <BeatProcrastination apiBaseUrl={API} onNavigateToTab={(tab: any) => setActiveTab(tab)} />
+        )}
+
+        {/* ========================================================== */}
+        {/* MODULE: FEATURE 2 - MEMORY VAULT (GOALS & PRINCIPLES)      */}
+        {/* ========================================================== */}
+        {activeTab === 'memories' && (
+          <MemoryVault apiBaseUrl={API} onNavigateToTab={(tab: any) => setActiveTab(tab)} />
         )}
 
         {/* ========================================================== */}

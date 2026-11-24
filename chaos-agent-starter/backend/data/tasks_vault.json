@@ -1,7 +1,25 @@
 {
   "version": "1.0",
-  "updatedAt": "2026-11-24T13:43:29.236Z",
+  "updatedAt": "2026-11-24T14:12:00.103Z",
   "tasks": [
+    {
+      "id": "task_1795527907590_7skph",
+      "title": "Complete my project documentation",
+      "description": "Autonomous task generated via JARVIS natural language interface.",
+      "priority": "medium",
+      "dueDate": "2026-11-27",
+      "dueTime": "",
+      "category": "Documentation",
+      "status": "pending",
+      "subtasks": [],
+      "createdAt": "2026-11-24T13:45:07.590Z",
+      "updatedAt": "2026-11-24T13:45:07.590Z",
+      "completedAt": null,
+      "source": "manual",
+      "tags": [
+        "documentation"
+      ]
+    },
     {
       "id": "task_sample_01",
       "title": "Complete autonomous agent architecture documentation",
@@ -10,7 +28,7 @@
       "dueDate": "2026-11-24",
       "dueTime": "17:00",
       "category": "Documentation",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "id": "sub_01_1",
@@ -25,7 +43,7 @@
         {
           "id": "sub_01_3",
           "title": "Add OpenAPI specifications for smart task routes",
-          "completed": true
+          "completed": false
         },
         {
           "id": "sub_1795527804651_0",
@@ -46,10 +64,30 @@
           "id": "sub_1795527804651_3",
           "title": "Finalize review, document changes, and deploy",
           "completed": false
+        },
+        {
+          "id": "sub_1795527894668_0",
+          "title": "Define scope, deliverables, and acceptance criteria for project",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527894668_1",
+          "title": "Execute core technical implementation and integrate dependencies",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527894668_2",
+          "title": "Conduct end-to-end testing, error recovery, and verification",
+          "completed": false
+        },
+        {
+          "id": "sub_1795527894668_3",
+          "title": "Finalize review, document changes, and deploy",
+          "completed": false
         }
       ],
       "createdAt": "2026-11-22T12:57:18.011Z",
-      "updatedAt": "2026-11-24T13:43:29.236Z",
+      "updatedAt": "2026-11-24T13:44:54.676Z",
       "source": "manual",
       "tags": [
         "architecture",

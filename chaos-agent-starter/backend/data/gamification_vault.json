@@ -1,0 +1,265 @@
+{
+  "version": "1.0",
+  "totalXp": 600,
+  "transactions": [
+    {
+      "id": "tx_1795529492812_q6fz",
+      "amount": 180,
+      "reason": "Completed task: \"Critical Bugfix and Release\"",
+      "sourceType": "task_completion",
+      "taskId": "test_task_1795529492792",
+      "idempotencyKey": "task_comp_test_task_1795529492792",
+      "createdAt": "2026-11-24T14:11:32.812Z"
+    },
+    {
+      "id": "tx_1795529492806_pdmc",
+      "amount": 100,
+      "reason": "Unlocked achievement: Urgent Resolver",
+      "sourceType": "achievement",
+      "idempotencyKey": "ach_URGENT_RESOLVER",
+      "createdAt": "2026-11-24T14:11:32.806Z"
+    },
+    {
+      "id": "tx_seed_01",
+      "amount": 50,
+      "reason": "Completed task: Setup cross-device QR code instant pairing gateway",
+      "sourceType": "task_completion",
+      "idempotencyKey": "task_comp_task_sample_05",
+      "createdAt": "2026-11-22T14:10:33.024Z"
+    },
+    {
+      "id": "tx_seed_02",
+      "amount": 50,
+      "reason": "Unlocked achievement: First Jump",
+      "sourceType": "achievement",
+      "idempotencyKey": "ach_FIRST_JUMP",
+      "createdAt": "2026-11-22T14:10:33.024Z"
+    },
+    {
+      "id": "tx_seed_03",
+      "amount": 120,
+      "reason": "Unlocked achievement: Decomposition Pro",
+      "sourceType": "achievement",
+      "idempotencyKey": "ach_DECOMPOSITION_PRO",
+      "createdAt": "2026-11-23T14:10:33.024Z"
+    },
+    {
+      "id": "tx_seed_04",
+      "amount": 100,
+      "reason": "Unlocked achievement: Memory Architect",
+      "sourceType": "achievement",
+      "idempotencyKey": "ach_MEMORY_ARCHITECT",
+      "createdAt": "2026-11-23T14:10:33.024Z"
+    }
+  ],
+  "streak": {
+    "currentStreak": 3,
+    "longestStreak": 4,
+    "lastActivityDate": "2026-11-24",
+    "weeklyHistory": {
+      "2026-11-23": 1,
+      "2026-11-24": 2
+    },
+    "dailyGoalTargets": [
+      "task_sample_01",
+      "task_sample_02",
+      "test_task_1795529433030",
+      "test_task_1795529492792"
+    ],
+    "dailyGoalCompleted": false
+  },
+  "achievements": [
+    {
+      "id": "ach_01",
+      "code": "FIRST_JUMP",
+      "title": "First Jump",
+      "description": "Complete your very first task in JARVIS",
+      "icon": "Zap",
+      "category": "Milestones",
+      "xpReward": 50,
+      "requiredCount": 1,
+      "currentCount": 1,
+      "isUnlocked": true,
+      "unlockedAt": "2026-11-22T14:10:33.025Z"
+    },
+    {
+      "id": "ach_02",
+      "code": "TASK_CENTURION",
+      "title": "Task Centurion",
+      "description": "Successfully complete 10 operational tasks",
+      "icon": "CheckCircle",
+      "category": "Milestones",
+      "xpReward": 150,
+      "requiredCount": 10,
+      "currentCount": 2,
+      "isUnlocked": false
+    },
+    {
+      "id": "ach_03",
+      "code": "CONSISTENCY_ENGINE",
+      "title": "Consistency Engine",
+      "description": "Maintain an active daily completion streak for 3 consecutive days",
+      "icon": "Flame",
+      "category": "Consistency",
+      "xpReward": 100,
+      "requiredCount": 3,
+      "currentCount": 2,
+      "isUnlocked": false
+    },
+    {
+      "id": "ach_04",
+      "code": "TIME_GUARDIAN",
+      "title": "Time Guardian",
+      "description": "Maintain a stellar 7-day completion streak",
+      "icon": "Shield",
+      "category": "Consistency",
+      "xpReward": 250,
+      "requiredCount": 7,
+      "currentCount": 2,
+      "isUnlocked": false
+    },
+    {
+      "id": "ach_05",
+      "code": "URGENT_RESOLVER",
+      "title": "Urgent Resolver",
+      "description": "Complete a critical urgent priority task before deadline",
+      "icon": "AlertTriangle",
+      "category": "Focus",
+      "xpReward": 100,
+      "requiredCount": 1,
+      "currentCount": 1,
+      "isUnlocked": true,
+      "unlockedAt": "2026-11-24T14:11:32.800Z"
+    },
+    {
+      "id": "ach_06",
+      "code": "DECOMPOSITION_PRO",
+      "title": "Decomposition Pro",
+      "description": "Break down a project into subtasks and resolve all steps",
+      "icon": "Layers",
+      "category": "Mastery",
+      "xpReward": 120,
+      "requiredCount": 1,
+      "currentCount": 1,
+      "isUnlocked": true,
+      "unlockedAt": "2026-11-23T14:10:33.025Z"
+    },
+    {
+      "id": "ach_07",
+      "code": "MEMORY_ARCHITECT",
+      "title": "Memory Architect",
+      "description": "Store 3 core project goals in the Memory Vault",
+      "icon": "Brain",
+      "category": "Mastery",
+      "xpReward": 100,
+      "requiredCount": 3,
+      "currentCount": 3,
+      "isUnlocked": true,
+      "unlockedAt": "2026-11-23T14:10:33.025Z"
+    },
+    {
+      "id": "ach_08",
+      "code": "CHALLENGE_CHAMPION",
+      "title": "Challenge Champion",
+      "description": "Conquer and complete a weekly productivity challenge",
+      "icon": "Trophy",
+      "category": "Focus",
+      "xpReward": 150,
+      "requiredCount": 1,
+      "currentCount": 0,
+      "isUnlocked": false
+    },
+    {
+      "id": "ach_09",
+      "code": "FLOW_STATE",
+      "title": "Flow State Novice",
+      "description": "Complete a 25-minute Pomodoro focus session",
+      "icon": "Target",
+      "category": "Focus",
+      "xpReward": 80,
+      "requiredCount": 1,
+      "currentCount": 0,
+      "isUnlocked": false
+    },
+    {
+      "id": "ach_10",
+      "code": "DAILY_MASTER",
+      "title": "Daily Goal Master",
+      "description": "Complete all selected daily targets in a single day",
+      "icon": "Award",
+      "category": "Consistency",
+      "xpReward": 120,
+      "requiredCount": 1,
+      "currentCount": 0,
+      "isUnlocked": false
+    }
+  ],
+  "challenges": [
+    {
+      "id": "chal_1795529492900_ovmm",
+      "title": "Resolve 3 High Priority Objectives",
+      "description": "Deep work sprint",
+      "category": "weekly",
+      "targetCount": 3,
+      "currentCount": 0,
+      "xpReward": 200,
+      "startDate": "2026-11-24",
+      "endDate": "2026-12-01",
+      "status": "active"
+    },
+    {
+      "id": "chal_1795529433235_bulu",
+      "title": "Resolve 3 High Priority Objectives",
+      "description": "Deep work sprint",
+      "category": "weekly",
+      "targetCount": 3,
+      "currentCount": 0,
+      "xpReward": 200,
+      "startDate": "2026-11-24",
+      "endDate": "2026-12-01",
+      "status": "active"
+    },
+    {
+      "id": "chal_01",
+      "title": "Sprint: Complete 3 High or Urgent Tasks",
+      "description": "Knock out three critical or high-priority items before the week concludes to maintain momentum.",
+      "category": "weekly",
+      "targetCount": 3,
+      "currentCount": 3,
+      "xpReward": 150,
+      "startDate": "2026-11-24",
+      "endDate": "2026-11-29",
+      "status": "completed",
+      "completedAt": "2026-11-24T14:10:33.159Z"
+    },
+    {
+      "id": "chal_02",
+      "title": "Flow Master: 2 Focus Sessions",
+      "description": "Execute two 25-minute distraction-free focus blocks with the JARVIS Pomodoro timer.",
+      "category": "weekly",
+      "targetCount": 2,
+      "currentCount": 2,
+      "xpReward": 120,
+      "startDate": "2026-11-24",
+      "endDate": "2026-11-29",
+      "status": "completed",
+      "completedAt": "2026-11-24T14:11:32.879Z"
+    },
+    {
+      "id": "chal_03",
+      "title": "Daily Triple: Complete 3 Tasks Today",
+      "description": "Focus on consistent daily throughput by finishing 3 tasks scheduled for today.",
+      "category": "daily",
+      "targetCount": 3,
+      "currentCount": 3,
+      "xpReward": 100,
+      "startDate": "2026-11-24",
+      "endDate": "2026-11-24",
+      "status": "completed",
+      "completedAt": "2026-11-24T14:10:33.180Z"
+    }
+  ],
+  "focusSessionsCompleted": 2,
+  "totalTasksCompletedCount": 5,
+  "updatedAt": "2026-11-24T14:11:32.902Z"
+}

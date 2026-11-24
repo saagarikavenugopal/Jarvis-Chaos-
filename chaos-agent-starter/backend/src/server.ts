@@ -41,6 +41,27 @@ import {
   generateDailyTaskSummary,
   parseTaskRequestDeterministic
 } from './taskAiService.js';
+import {
+  getGamificationProfile,
+  recordTaskCompletionGamification,
+  recordFocusSession,
+  toggleDailyGoalTarget,
+  createCustomChallenge,
+  generateProcrastinationAssistance,
+  awardXp,
+  USER_LEVELS
+} from './gamificationDatabase.js';
+import {
+  getAllMemories,
+  getMemoryById,
+  createMemory,
+  updateMemory,
+  deleteMemory,
+  toggleFavoriteMemory,
+  linkTaskToMemory,
+  unlinkTaskFromMemory,
+  getMemoriesForTask
+} from './memoryVaultDatabase.js';
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -1137,11 +1158,16 @@ app.post('/api/tasks', (req, res) => {
 // 9. Update task
 app.put('/api/tasks/:id', (req, res) => {
   try {
+    const prevTask = getTaskById(req.params.id);
     const updated = updateTask(req.params.id, req.body);
     if (!updated) {
       return res.status(404).json({ ok: false, error: 'Task not found' });
     }
-    res.json({ ok: true, task: updated });
+    let gamification = null;
+    if (updated.status === 'completed' && (!prevTask || prevTask.status !== 'completed')) {
+      gamification = recordTaskCompletionGamification(updated);
+    }
+    res.json({ ok: true, task: updated, gamification });
   } catch (err: any) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -1198,6 +1224,220 @@ app.delete('/api/tasks/:id/subtasks/:subtaskId', (req, res) => {
       return res.status(404).json({ ok: false, error: 'Task or subtask not found' });
     }
     res.json({ ok: true, task: updated });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ==========================================================
+// FEATURE 2: GAMIFICATION & BEAT PROCRASTINATION REST API
+// ==========================================================
+
+// 1. Get Gamification Profile (Level, XP, Streaks, Achievements, Challenges)
+app.get('/api/gamification/profile', (_req, res) => {
+  try {
+    const profile = getGamificationProfile();
+    res.json({ ok: true, ...profile });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 2. Explicitly trigger task completion gamification reward
+app.post('/api/gamification/task-completed', (req, res) => {
+  try {
+    const { taskId, task: bodyTask } = req.body;
+    const task = bodyTask || (taskId ? getTaskById(taskId) : null);
+    if (!task) {
+      return res.status(400).json({ ok: false, error: 'Valid task or taskId is required' });
+    }
+    const result = recordTaskCompletionGamification(task);
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 3. Record Pomodoro Focus Session
+app.post('/api/gamification/focus-session', (req, res) => {
+  try {
+    const minutes = Number(req.body.minutes || 25);
+    const taskId = req.body.taskId ? String(req.body.taskId) : undefined;
+    const result = recordFocusSession(minutes, taskId);
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 4. Toggle Daily Goal Target Task
+app.post('/api/gamification/daily-goal/toggle', (req, res) => {
+  try {
+    const { taskId } = req.body;
+    if (!taskId) {
+      return res.status(400).json({ ok: false, error: 'taskId is required' });
+    }
+    const result = toggleDailyGoalTarget(taskId);
+    res.json({ ok: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 5. Create Custom Productivity Challenge
+app.post('/api/gamification/challenges', (req, res) => {
+  try {
+    const challenge = createCustomChallenge(req.body);
+    res.status(201).json({ ok: true, challenge });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 6. Procrastination Assistance Engine
+app.get('/api/gamification/procrastination-help', (_req, res) => {
+  try {
+    const assistance = generateProcrastinationAssistance();
+    res.json({ ok: true, assistance });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ==========================================================
+// FEATURE 2: MEMORY VAULT REST API
+// ==========================================================
+
+// 1. Get Memories with Search, Category, Tag, and Favorite filters
+app.get('/api/memories', (req, res) => {
+  try {
+    const { search, category, tag, favorite } = req.query;
+    const memories = getAllMemories({
+      search: search ? String(search) : undefined,
+      category: category ? String(category) : undefined,
+      tag: tag ? String(tag) : undefined,
+      favorite: favorite === 'true' ? true : undefined
+    });
+    res.json({ ok: true, memories, total: memories.length });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 2. Get single memory by ID
+app.get('/api/memories/:id', (req, res) => {
+  try {
+    const memory = getMemoryById(req.params.id);
+    if (!memory) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, memory });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 3. Create new Memory
+app.post('/api/memories', (req, res) => {
+  try {
+    const { title, content, category, importance, goalDeadline, linkedTaskIds, tags, isFavorite } = req.body;
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return res.status(400).json({ ok: false, error: 'Memory title is required' });
+    }
+    const memory = createMemory({
+      title,
+      content,
+      category,
+      importance,
+      goalDeadline,
+      linkedTaskIds,
+      tags,
+      isFavorite
+    });
+    res.status(201).json({ ok: true, memory });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 4. Update Memory
+app.put('/api/memories/:id', (req, res) => {
+  try {
+    const updated = updateMemory(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, memory: updated });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 5. Delete Memory
+app.delete('/api/memories/:id', (req, res) => {
+  try {
+    const deleted = deleteMemory(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, message: 'Memory successfully removed' });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 6. Toggle Favorite Memory
+app.patch('/api/memories/:id/favorite', (req, res) => {
+  try {
+    const updated = toggleFavoriteMemory(req.params.id);
+    if (!updated) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, memory: updated });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 7. Link Task to Memory
+app.post('/api/memories/:id/link-task', (req, res) => {
+  try {
+    const { taskId } = req.body;
+    if (!taskId) {
+      return res.status(400).json({ ok: false, error: 'taskId is required' });
+    }
+    const updated = linkTaskToMemory(req.params.id, taskId);
+    if (!updated) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, memory: updated });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 8. Unlink Task from Memory
+app.post('/api/memories/:id/unlink-task', (req, res) => {
+  try {
+    const { taskId } = req.body;
+    if (!taskId) {
+      return res.status(400).json({ ok: false, error: 'taskId is required' });
+    }
+    const updated = unlinkTaskFromMemory(req.params.id, taskId);
+    if (!updated) {
+      return res.status(404).json({ ok: false, error: 'Memory not found' });
+    }
+    res.json({ ok: true, memory: updated });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// 9. Get Memories Linked to a Task
+app.get('/api/tasks/:id/memories', (req, res) => {
+  try {
+    const memories = getMemoriesForTask(req.params.id);
+    res.json({ ok: true, memories });
   } catch (err: any) {
     res.status(500).json({ ok: false, error: err.message });
   }

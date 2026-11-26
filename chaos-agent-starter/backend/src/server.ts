@@ -99,6 +99,13 @@ import {
   GCALENDAR_MCP_TOOLS,
   executeCalendarMcpTool
 } from './googleCalendarMcpService.js';
+import {
+  getSupabaseConfig,
+  testSupabaseConnection,
+  syncAllToSupabase,
+  setCustomSupabaseCredentials,
+  getFullSqlSchema
+} from './supabaseService.js';
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -125,9 +132,71 @@ app.get('/api/health', (_req, res) => {
       email: Boolean(resend && process.env.EMAIL_FROM && process.env.EMAIL_SEND_ENABLED === 'true'),
       pdf: true,
       tasks: true,
-      cloudHistory: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+      cloudHistory: Boolean(process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY))
     }
   });
+});
+
+// ==========================================================
+// SUPABASE POSTGRESQL CLOUD DATABASE INTEGRATION
+// ==========================================================
+
+app.get('/api/supabase/status', async (_req, res) => {
+  try {
+    const config = getSupabaseConfig();
+    if (!config.configured) {
+      return res.json({
+        ok: true,
+        configured: false,
+        connected: false,
+        url: null,
+        message: 'Supabase credentials not configured in backend/.env or Vercel.'
+      });
+    }
+    const test = await testSupabaseConnection();
+    return res.json({
+      ok: true,
+      configured: true,
+      connected: test.connected,
+      latencyMs: test.latencyMs,
+      tablesFound: test.tablesFound,
+      url: test.url,
+      message: test.message
+    });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/supabase/sync', async (_req, res) => {
+  try {
+    const result = await syncAllToSupabase();
+    return res.json({ ok: result.success, ...result });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.get('/api/supabase/schema', (_req, res) => {
+  try {
+    res.json({ ok: true, sql: getFullSqlSchema() });
+  } catch (err: any) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/supabase/configure', async (req, res) => {
+  try {
+    const { url, key } = req.body || {};
+    if (!url || !key) {
+      return res.status(400).json({ ok: false, message: 'Supabase URL and Key are required.' });
+    }
+    setCustomSupabaseCredentials(url, key);
+    const test = await testSupabaseConnection();
+    return res.json({ ok: test.connected, ...test });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
 app.get('/api/network-info', (_req, res) => {

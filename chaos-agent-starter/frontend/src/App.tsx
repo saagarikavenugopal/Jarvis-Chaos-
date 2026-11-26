@@ -50,6 +50,9 @@ import {
   Trophy,
   HardDrive,
   Calendar,
+  Database,
+  UploadCloud,
+  RefreshCw,
 } from 'lucide-react';
 import { LoginPage } from './LoginPage';
 import { LandingPage } from './LandingPage';
@@ -254,6 +257,99 @@ export default function App() {
   const [cloudSyncEnabled, setCloudSyncEnabled] = useState(false);
   const [passwordNotice, setPasswordNotice] = useState<string | null>(null);
 
+  // Supabase Cloud Database Integration State
+  const [supabaseStatus, setSupabaseStatus] = useState<{
+    configured: boolean;
+    connected: boolean;
+    latencyMs?: number;
+    tablesFound?: string[];
+    url?: string | null;
+    message: string;
+  } | null>(null);
+  const [supabaseLoading, setSupabaseLoading] = useState(false);
+  const [showSupabaseConfigModal, setShowSupabaseConfigModal] = useState(false);
+  const [supabaseInputUrl, setSupabaseInputUrl] = useState('');
+  const [supabaseInputKey, setSupabaseInputKey] = useState('');
+  const [showSchemaModal, setShowSchemaModal] = useState(false);
+  const [schemaSql, setSchemaSql] = useState('');
+  const [copiedSchema, setCopiedSchema] = useState(false);
+
+  const fetchSupabaseStatus = async () => {
+    try {
+      const res = await fetch(`${API}/api/supabase/status`);
+      if (res.ok) {
+        const data = await res.json();
+        setSupabaseStatus(data);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleTestSupabase = async () => {
+    setSupabaseLoading(true);
+    try {
+      const res = await fetch(`${API}/api/supabase/status`);
+      const data = await res.json();
+      setSupabaseStatus(data);
+      alert(data.message || (data.connected ? 'Connected to Supabase!' : 'Connection test finished.'));
+    } catch (err: any) {
+      alert('Could not test Supabase: ' + err.message);
+    } finally {
+      setSupabaseLoading(false);
+    }
+  };
+
+  const handleSyncSupabase = async () => {
+    setSupabaseLoading(true);
+    try {
+      const res = await fetch(`${API}/api/supabase/sync`, { method: 'POST' });
+      const data = await res.json();
+      alert(data.message || (data.ok ? 'Data successfully synchronized to Supabase!' : 'Sync failed.'));
+      fetchSupabaseStatus();
+    } catch (err: any) {
+      alert('Sync failed: ' + err.message);
+    } finally {
+      setSupabaseLoading(false);
+    }
+  };
+
+  const handleViewSchema = async () => {
+    try {
+      const res = await fetch(`${API}/api/supabase/schema`);
+      const data = await res.json();
+      if (data.sql) {
+        setSchemaSql(data.sql);
+        setShowSchemaModal(true);
+      }
+    } catch (err: any) {
+      alert('Could not load schema: ' + err.message);
+    }
+  };
+
+  const handleSaveSupabaseConfig = async () => {
+    if (!supabaseInputUrl.trim() || !supabaseInputKey.trim()) {
+      alert('Please provide both Supabase Project URL and API Key.');
+      return;
+    }
+    setSupabaseLoading(true);
+    try {
+      const res = await fetch(`${API}/api/supabase/configure`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: supabaseInputUrl.trim(), key: supabaseInputKey.trim() })
+      });
+      const data = await res.json();
+      setSupabaseStatus(data);
+      setShowSupabaseConfigModal(false);
+      alert(data.message || (data.connected ? 'Connected to Supabase!' : 'Failed to connect.'));
+    } catch (err: any) {
+      alert('Failed to configure: ' + err.message);
+    } finally {
+      setSupabaseLoading(false);
+    }
+  };
+
   const handleSignOut = () => {
     localStorage.removeItem('chaos-auth-status');
     setIsAuthenticated(false);
@@ -335,6 +431,7 @@ export default function App() {
             }
           })
           .catch(() => {});
+        fetchSupabaseStatus();
       } else {
         setBackendOnline(false);
       }
@@ -2625,22 +2722,90 @@ export default function App() {
                   </div>
                 </label>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={cloudSyncEnabled}
-                    onChange={() => {
-                      alert('Cloud sync requires Supabase Auth and per-user RLS policies. Local storage is enforced in this starter.');
-                      setCloudSyncEnabled(false);
-                    }}
-                  />
-                  <div>
-                    <strong style={{ fontSize: 13, display: 'block' }}>Cloud History Sync (Supabase)</strong>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      Requires configured Supabase credentials and Row-Level Security before enabling.
+                {/* Supabase Cloud Database Integration Box */}
+                <div
+                  style={{
+                    background: 'var(--bg-surface-elevated)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 14,
+                    padding: '18px 20px',
+                    marginTop: 10
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <Database size={20} color="var(--primary)" />
+                      <div>
+                        <strong style={{ fontSize: 14, color: 'var(--text-main)' }}>
+                          Supabase PostgreSQL Cloud Database
+                        </strong>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                          {supabaseStatus?.configured
+                            ? `Project: ${supabaseStatus.url || 'Configured'}`
+                            : 'Awaiting SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <span
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 9999,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        background: supabaseStatus?.connected ? 'var(--pastel-mint)' : 'var(--amber-subtle)',
+                        color: supabaseStatus?.connected ? 'var(--secondary-text)' : '#b45309',
+                        border: `1px solid ${supabaseStatus?.connected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+                      }}
+                    >
+                      {supabaseStatus?.connected
+                        ? `✓ Connected (${supabaseStatus.latencyMs ?? 20}ms)`
+                        : supabaseStatus?.configured
+                        ? 'Connecting...'
+                        : 'Credentials Required'}
                     </span>
                   </div>
-                </label>
+
+                  <p style={{ margin: '0 0 14px', fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                    {supabaseStatus?.message || 'Connect your Supabase PostgreSQL project to enable multi-device cloud persistence for tasks, memories, and gamification.'}
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={handleTestSupabase}
+                      disabled={supabaseLoading}
+                      style={{ fontSize: 12, padding: '7px 14px' }}
+                    >
+                      <RefreshCw size={13} className={supabaseLoading ? 'animate-spin' : ''} />
+                      <span>Test Connection</span>
+                    </button>
+                    <button
+                      className="btn-primary"
+                      onClick={handleSyncSupabase}
+                      disabled={supabaseLoading || !supabaseStatus?.configured}
+                      style={{ fontSize: 12, padding: '7px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <UploadCloud size={13} />
+                      <span>Sync Data to Supabase</span>
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => setShowSupabaseConfigModal(true)}
+                      style={{ fontSize: 12, padding: '7px 14px' }}
+                    >
+                      <span>Configure URL & Key</span>
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={handleViewSchema}
+                      style={{ fontSize: 12, padding: '7px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <FileText size={13} />
+                      <span>View SQL Schema</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2759,6 +2924,161 @@ export default function App() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Supabase Dynamic Configuration Modal */}
+      {showSupabaseConfigModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: 20
+          }}
+        >
+          <div
+            style={{
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: 16,
+              width: '100%',
+              maxWidth: 580,
+              padding: 28,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Database size={22} color="var(--primary)" />
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>Connect Supabase Database</h3>
+              </div>
+              <button className="btn-secondary" style={{ padding: '6px 10px' }} onClick={() => setShowSupabaseConfigModal(false)}>✕</button>
+            </div>
+
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              Enter your Supabase Project credentials from <strong>Project Settings → API</strong>. Once connected, your tasks, memories, and productivity XP will synchronize directly with PostgreSQL.
+            </p>
+
+            <div style={{ display: 'grid', gap: 14 }}>
+              <div>
+                <label className="form-label" style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>
+                  Supabase Project URL
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="https://xyzprojectid.supabase.co"
+                  value={supabaseInputUrl}
+                  onChange={e => setSupabaseInputUrl(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>
+                  Supabase Service Role Key (or Anon Key)
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  value={supabaseInputKey}
+                  onChange={e => setSupabaseInputKey(e.target.value)}
+                />
+              </div>
+
+              <div
+                style={{
+                  background: 'var(--pastel-sky)',
+                  padding: 12,
+                  borderRadius: 10,
+                  fontSize: 12,
+                  color: 'var(--pastel-sky-text)',
+                  lineHeight: 1.4
+                }}
+              >
+                💡 <strong>Tip:</strong> For persistent production deployments, you can also set <code>SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> in your Vercel Project Environment Variables.
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 8 }}>
+                <button className="btn-secondary" onClick={() => setShowSupabaseConfigModal(false)}>Cancel</button>
+                <button className="btn-primary" disabled={supabaseLoading} onClick={handleSaveSupabaseConfig}>
+                  {supabaseLoading ? 'Connecting...' : 'Save & Connect'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Supabase Full SQL Schema Modal */}
+      {showSchemaModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1100,
+            padding: 20
+          }}
+        >
+          <div
+            style={{
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: 16,
+              width: '100%',
+              maxWidth: 820,
+              maxHeight: '85vh',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: 26,
+              boxShadow: '0 25px 50px rgba(0,0,0,0.2)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <FileText size={20} color="var(--primary)" />
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>Supabase PostgreSQL Migration Schema</h3>
+              </div>
+              <button className="btn-secondary" style={{ padding: '6px 10px' }} onClick={() => setShowSchemaModal(false)}>✕</button>
+            </div>
+
+            <p style={{ margin: '0 0 12px', fontSize: 12.5, color: 'var(--text-muted)' }}>
+              Paste this SQL into your Supabase Dashboard under <strong>SQL Editor → New Query → Run</strong> to automatically create all tables, indexes, and Row-Level Security policies.
+            </p>
+
+            <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: 10, padding: 14, marginBottom: 16 }}>
+              <pre style={{ margin: 0, fontSize: 11.5, fontFamily: 'monospace', lineHeight: 1.5, whiteSpace: 'pre-wrap', color: 'var(--text-main)' }}>
+                {schemaSql}
+              </pre>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  navigator.clipboard.writeText(schemaSql);
+                  setCopiedSchema(true);
+                  setTimeout(() => setCopiedSchema(false), 2500);
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                {copiedSchema ? <Check size={14} /> : <Copy size={14} />}
+                <span>{copiedSchema ? 'SQL Copied to Clipboard!' : 'Copy SQL Schema'}</span>
+              </button>
+              <button className="btn-secondary" onClick={() => setShowSchemaModal(false)}>Close</button>
             </div>
           </div>
         </div>
